@@ -1,25 +1,43 @@
 class cellulair_automata():
     def __init__(self):
-        return
+        #Deze variablen staan nu op de standaardwaarden zodat het 
+        #programma geen errors geeft maar kunnen bij de subclasses 
+        #ingevoerd worden op wat ze moeten zijn.
+        self.dimensions     = 1
+        self.grid           = [0]
+        self.lisofneighbours = [0]
+        
     
-    def regels(self):
-        print('this is an ordinary celluair automaton')
-        return
+    def regels(self,coordinaten):
+        #Deze functie bestaat puur en alleen om door de child objecten overschreven te worden.
+        print('this is the base celluair automaton')
+        nieuwetoestand = 0
+        return nieuwetoestand #we returnen de nieuwe toestand van het inputvakje
+        
     
     def evolueer(self):
-        self.regels()
-        return
+        #deze functie wordt door alle subclasses gebruikt en looped door elke entry
+        #van het grid en voert op dat vakje de functie regels uit
+        self.regels([0])
+        
+    
+#------------------------------------------------------------------------------    
     
     
 class game_of_life(cellulair_automata):
-    def __init__(self):
+    def __init__(self,startgrid):
+        self.dimensions     = 2
+        self.grid           = startgrid
+        self.lisofneighbours = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,-1]]
         return
-    def regels(self):
+    def regels(self,coordinaten):
         print('this is the game of life')
+        nieuwetoestand = 0
+        return nieuwetoestand
         
-        
-
-x = game_of_life()
+#-----------------------------------------------------------------------------    
+#testcode om het verschil tussen de automata te laten zien
+x = game_of_life([[0]])
 x.evolueer()
 y = cellulair_automata()
 y.evolueer()  
