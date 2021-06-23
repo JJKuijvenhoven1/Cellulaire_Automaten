@@ -41,7 +41,7 @@ class cellulair_automata():
             while len(coord_lijst) < d:
                 coord_lijst.insert(0, 0)
             coord_tuple = tuple(coord_lijst)
-            nieuwe_grid = evolueer_cel(coord_tuple, nieuwe_grid)
+            nieuwe_grid = self.evolueer_cel(coord_tuple, nieuwe_grid)
         self.grid = nieuwe_grid
         
         
