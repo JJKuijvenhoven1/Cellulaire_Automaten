@@ -20,14 +20,15 @@ class cellulair_automata():
         return nieuwetoestand #we returnen de nieuwe toestand van het inputvakje
         
     
-    def evolueer_cel(self, coord_tuple, grid, nieuwe_grid):
+    def evolueer_cel(self, coord_tuple, nieuwe_grid):
         nieuwe_grid[coord_tuple] = 1
+        print(self.grid)
         print(self.regels)
         return nieuwe_grid 
 
-    def evolueer(self, grid):
+    def evolueer(self):
         d = self.dimensions
-        n = self. gridlength
+        n = self.gridlength
         nieuwe_grid = np.zeros(shape=[n]*d)
         for x in range(1, n**d):
             coord_lijst = []
@@ -40,8 +41,9 @@ class cellulair_automata():
             while len(coord_lijst) < d:
                 coord_lijst.insert(0, 0)
             coord_tuple = tuple(coord_lijst)
-            nieuwe_grid = evolueer_cel(coord_tuple, grid, nieuwe_grid)
-        return nieuwe_grid
+            nieuwe_grid = evolueer_cel(coord_tuple, nieuwe_grid)
+        self.grid = nieuwe_grid
+        
         
     
 #------------------------------------------------------------------------------    
@@ -63,4 +65,4 @@ class game_of_life(cellulair_automata):
 x = game_of_life([[0]])
 #x.evolueer()
 y = cellulair_automata()
-y.evolueer(2,2,np.zeros(shape=[2]*2))  
+y.evolueer()  
