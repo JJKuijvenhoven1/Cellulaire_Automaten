@@ -11,18 +11,12 @@ class cellulair_automata():
         self.grid           = [0]
         self.lisofneighbours = [0]
         self.regels = 0
-        
+               
     
-    def regels(self,coordinaten):
+    def evolueer_cel(self, coord_tuple):
         #Deze functie bestaat puur en alleen om door de child objecten overschreven te worden.
-        print('this is the base celluair automaton')
-        nieuwetoestand = 0
-        return nieuwetoestand #we returnen de nieuwe toestand van het inputvakje
-        
-    
-    def evolueer_cel(self, coord_tuple, nieuwe_grid):
-        nieuwe_grid[coord_tuple] = 1
-        return nieuwe_grid 
+        nieuwe_toestand = 1
+        return nieuwe_toestand
 
     def evolueer(self, iterations=1):
         d = self.dimensions
@@ -39,7 +33,7 @@ class cellulair_automata():
             while len(coord_lijst) < d:
                 coord_lijst.insert(0, 0)
             coord_tuple = tuple(coord_lijst)
-            nieuwe_grid = self.evolueer_cel(coord_tuple, nieuwe_grid)
+            nieuwe_grid[coord_tuple] = self.evolueer_cel(coord_tuple)
         
         self.grid = nieuwe_grid
         
