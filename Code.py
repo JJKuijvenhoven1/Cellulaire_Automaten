@@ -191,14 +191,16 @@ class game_of_life(cellulair_automata):
             return midden
  
 #------------------------------------------------------------------------------
-class kut_game2d(cellulair_automata()):
-    def __init__(self, startgrid, regels='000001110000000000',randvoorwaarden=0,burenlijst=[[-1,-1],[-1,0],[-1,1],[0,1],[1,1],[1,0],[1,-1],[0,-1]]):
+class kut_game2d(cellulair_automata):
+    def __init__(self, startgrid, regels='000001110000000000',randvoorwaarden=1,burenlijst=[[-1,-1],[-1,0],[-1,1],[0,1],[1,1],[1,0],[1,-1],[0,-1]]):
         self.dimensions = 2
         self.gridlength = len(startgrid)+2
         #we accepteren geen buren die 2 vakjes ver weg zijn. lekker puh
         self.burenlijst = burenlijst
         self.randvoorwaarden = randvoorwaarden
         self.regels = regels
+        if len(regels)/2-1 != len(burenlijst):
+            print('jonathan boos :(')
         
         #start toestand invullen.
         row = np.array([-1]*(self.gridlength-2))
@@ -222,25 +224,36 @@ class kut_game2d(cellulair_automata()):
             buurtoestanden.append(self.grid[tuple(np.array(buur)+np.array(coord_lijst))])
         
         #randvoorwaarden
-        for i in range(len(buurtoestanden)):
-            if buurtoestanden[i] == -1:
-                buurtoestanden[i] = 0
+        if self.randvoorwaarden == 0:
+            #cirkeltje
+            print('HUILEN')
+            for i in range(len(buurtoestanden)):
+                if buurtoestanden[i] == -1:
+                    buurtoestanden[i] = 'cry yourself to sleep'
+        elif self.randvoorwaarden == 1:
+            #alles 0
+            for i in range(len(buurtoestanden)):
+                if buurtoestanden[i] == -1:
+                    buurtoestanden[i] = 0
+        elif self.randvoorwaarden == 2:
+            #alles 1
+            for i in range(len(buurtoestanden)):
+                if buurtoestanden[i] == -1:
+                    buurtoestanden[i] = 1
+        else:
+            print('dit is geen goede randvoorwaarde. Kies 0, 1 of 2')
+    
                
         #regels
         aantallevendeburen = 0
         for buurtoestand in buurtoestanden:
             if buurtoestand == 1:
                 aantallevendeburen += 1 
+        #plz geef uitleg:...
+        positie = 2*aantallevendeburen + int(midden)
         
-        if (aantallevendeburen >= 4 or aantallevendeburen <= 1 )and midden == 1:
-            #DIE
-            return 0
-        elif aantallevendeburen == 3 and midden == 0:
-            #wordt geboren
-            return 1
-        else:
-            #stay the same
-            return midden
+        return int(self.regels[positie])
+        
         
 
 
@@ -259,8 +272,17 @@ a = game_of_life(np.array([
     [0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0]]))
-a.evolueer()
-print(a.grid)
+b = kut_game2d(np.array([
+    [0,1,0,0,0,0,0],
+    [0,0,1,0,0,0,0],
+    [1,1,1,0,0,0,0],
+    [0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0]]))
+
+b.evolueer(2000)
+print(b.grid)
 
 
 
