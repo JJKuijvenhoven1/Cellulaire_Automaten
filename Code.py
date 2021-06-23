@@ -6,7 +6,8 @@ class cellulair_automata():
         #Deze variablen staan nu op de standaardwaarden zodat het 
         #programma geen errors geeft maar kunnen bij de subclasses 
         #ingevoerd worden op wat ze moeten zijn.
-        self.dimensions     = 1
+        self.dimensions     = 2
+        self.gridlength = 4
         self.grid           = [0]
         self.lisofneighbours = [0]
         self.regels = 0
@@ -19,12 +20,15 @@ class cellulair_automata():
         return nieuwetoestand #we returnen de nieuwe toestand van het inputvakje
         
     
-    def evolueer_cel(self,coord_tuple, regels, grid, nieuwe_generatie):
-        nieuwe_generatie[coord_tuple] = 1
+    def evolueer_cel(self, coord_tuple, grid, nieuwe_grid):
+        nieuwe_grid[coord_tuple] = 1
         print(self.regels)
+        return nieuwe_grid 
 
-    def evolueer(d, n, grid):
-        nieuwe_generatie = np.zeros(shape=[n]*d)
+    def evolueer(self, grid):
+        d = self.dimensions
+        n = self. gridlength
+        nieuwe_grid = np.zeros(shape=[n]*d)
         for x in range(1, n**d):
             coord_lijst = []
             lengte_getal = math.floor(math.log(x, n))
@@ -36,7 +40,7 @@ class cellulair_automata():
             while len(coord_lijst) < d:
                 coord_lijst.insert(0, 0)
             coord_tuple = tuple(coord_lijst)
-            evolueer_cel(coord_tuple, regels, grid, nieuwe_generatie)
+            nieuwe_grid = evolueer_cel(coord_tuple, grid, nieuwe_grid)
         return nieuwe_generatie
         
     
