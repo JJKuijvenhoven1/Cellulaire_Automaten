@@ -19,7 +19,7 @@ class cellulair_automata():
         
     
     def evolueer_cel(coord_tuple, regels, grid, nieuwe_generatie):
-    nieuwe_generatie[coord_tuple] = 1
+        nieuwe_generatie[coord_tuple] = 1
 
     def evolueer(d, n, regels, grid):
         nieuwe_generatie = np.zeros(shape=[n]*d)
