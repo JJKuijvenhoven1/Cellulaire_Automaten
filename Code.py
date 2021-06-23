@@ -26,7 +26,7 @@ class cellulair_automata():
         print(self.regels)
         return nieuwe_grid 
 
-    def evolueer(self):
+    def evolueer(self, iterations=1):
         d = self.dimensions
         n = self.gridlength
         nieuwe_grid = np.zeros(shape=[n]*d)
@@ -42,6 +42,7 @@ class cellulair_automata():
                 coord_lijst.insert(0, 0)
             coord_tuple = tuple(coord_lijst)
             nieuwe_grid = self.evolueer_cel(coord_tuple, nieuwe_grid)
+        print(nieuwe_grid)
         self.grid = nieuwe_grid
         
         
