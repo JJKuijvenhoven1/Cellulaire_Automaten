@@ -17,23 +17,24 @@ class cellulair_automata():
         return nieuwe_toestand
 
     def evolueer(self, iterations=1):
-        d = self.dimensions
-        n = self.gridlength
-        nieuwe_grid = -2*np.ones(shape=[n]*d)
-        nieuwe_grid[(0,)*d] = self.evolueer_cel([0]*d)
-        for x in range(1, n**d):
-            coord_lijst = []
-            lengte_getal = math.floor(math.log(x, n))
-            rest = x
-            for z in range(lengte_getal + 1):
-                quotient = rest // n**(lengte_getal - z)
-                coord_lijst.append(quotient)
-                rest = rest - quotient * n**(lengte_getal - z)
-            while len(coord_lijst) < d:
-                coord_lijst.insert(0, 0)
-            nieuwe_grid[tuple(coord_lijst)] = self.evolueer_cel(coord_lijst)
-        
-        self.grid = nieuwe_grid
+        for i in range(iterations):    
+            d = self.dimensions
+            n = self.gridlength
+            nieuwe_grid = -2*np.ones(shape=[n]*d)
+            nieuwe_grid[(0,)*d] = self.evolueer_cel([0]*d)
+            for x in range(1, n**d):
+                coord_lijst = []
+                lengte_getal = math.floor(math.log(x, n))
+                rest = x
+                for z in range(lengte_getal + 1):
+                    quotient = rest // n**(lengte_getal - z)
+                    coord_lijst.append(quotient)
+                    rest = rest - quotient * n**(lengte_getal - z)
+                while len(coord_lijst) < d:
+                    coord_lijst.insert(0, 0)
+                nieuwe_grid[tuple(coord_lijst)] = self.evolueer_cel(coord_lijst)
+            
+            self.grid = nieuwe_grid
     
 #------------------------------------------------------------------------------ 
        
@@ -170,7 +171,7 @@ class game_of_life(cellulair_automata):
         #nullen
         for i in range(len(buurtoestanden)):
             if buurtoestanden[i] == -1:
-                buurtoestanden[i] = 1
+                buurtoestanden[i] = 0
                
         #regels
         aantallevendeburen = 0
@@ -208,14 +209,6 @@ a = game_of_life(np.array([
     [0,0,0,0,0,0,0]]))
 a.evolueer()
 print(a.grid)
-a.evolueer()
-print('')
-print(a.grid)
-a.evolueer()
-print('')
-print(a.grid)
-a.evolueer()
-print('')
-print(a.grid)
+
 
 
