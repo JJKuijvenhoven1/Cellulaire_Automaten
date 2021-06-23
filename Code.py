@@ -36,7 +36,10 @@ class cellulair_automata():
             nieuwe_grid[coord_tuple] = self.evolueer_cel(coord_tuple)
         
         self.grid = nieuwe_grid
-        
+    
+#------------------------------------------------------------------------------        
+    
+    
         
     
 #------------------------------------------------------------------------------    
@@ -59,3 +62,4 @@ x = game_of_life([[0]])
 #x.evolueer()
 y = cellulair_automata()
 y.evolueer()  
+print(y.grid)
