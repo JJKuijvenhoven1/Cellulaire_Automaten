@@ -1,3 +1,6 @@
+import numpy as np
+import math
+
 class cellulair_automata():
     def __init__(self):
         #Deze variablen staan nu op de standaardwaarden zodat het 
