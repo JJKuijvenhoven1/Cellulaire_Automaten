@@ -1,24 +1,45 @@
+import numpy as np
+import math
+
 class cellulair_automata():
     def __init__(self):
         #Deze variablen staan nu op de standaardwaarden zodat het 
         #programma geen errors geeft maar kunnen bij de subclasses 
         #ingevoerd worden op wat ze moeten zijn.
-        self.dimensions     = 1
+        self.dimensions     = 2
+        self.gridlength = 4
         self.grid           = [0]
         self.lisofneighbours = [0]
-        
+        self.regels = 0
+               
     
-    def regels(self,coordinaten):
+    def evolueer_cel(self, coord_tuple):
         #Deze functie bestaat puur en alleen om door de child objecten overschreven te worden.
-        print('this is the base celluair automaton')
-        nieuwetoestand = 0
-        return nieuwetoestand #we returnen de nieuwe toestand van het inputvakje
+        nieuwe_toestand = 1
+        return nieuwe_toestand
+
+    def evolueer(self, iterations=1):
+        d = self.dimensions
+        n = self.gridlength
+        nieuwe_grid = np.zeros(shape=[n]*d)
+        for x in range(1, n**d):
+            coord_lijst = []
+            lengte_getal = math.floor(math.log(x, n))
+            rest = x
+            for z in range(lengte_getal + 1):
+                quotient = rest // n**(lengte_getal - z)
+                coord_lijst.append(quotient)
+                rest = rest - quotient * n**(lengte_getal - z)
+            while len(coord_lijst) < d:
+                coord_lijst.insert(0, 0)
+            coord_tuple = tuple(coord_lijst)
+            nieuwe_grid[coord_tuple] = self.evolueer_cel(coord_tuple)
         
+        self.grid = nieuwe_grid
     
-    def evolueer(self):
-        #deze functie wordt door alle subclasses gebruikt en looped door elke entry
-        #van het grid en voert op dat vakje de functie regels uit
-        self.regels([0])
+#------------------------------------------------------------------------------        
+    
+    
         
     
 #------------------------------------------------------------------------------    
@@ -38,6 +59,7 @@ class game_of_life(cellulair_automata):
 #-----------------------------------------------------------------------------    
 #testcode om het verschil tussen de automata te laten zien
 x = game_of_life([[0]])
-x.evolueer()
+#x.evolueer()
 y = cellulair_automata()
 y.evolueer()  
+print(y.grid)
