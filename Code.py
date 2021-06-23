@@ -9,6 +9,7 @@ class cellulair_automata():
         self.dimensions     = 1
         self.grid           = [0]
         self.lisofneighbours = [0]
+        self.regels = 0
         
     
     def regels(self,coordinaten):
@@ -18,10 +19,11 @@ class cellulair_automata():
         return nieuwetoestand #we returnen de nieuwe toestand van het inputvakje
         
     
-    def evolueer_cel(coord_tuple, regels, grid, nieuwe_generatie):
+    def evolueer_cel(self,coord_tuple, regels, grid, nieuwe_generatie):
         nieuwe_generatie[coord_tuple] = 1
+        print(self.regels)
 
-    def evolueer(d, n, regels, grid):
+    def evolueer(d, n, grid):
         nieuwe_generatie = np.zeros(shape=[n]*d)
         for x in range(1, n**d):
             coord_lijst = []
@@ -55,6 +57,6 @@ class game_of_life(cellulair_automata):
 #-----------------------------------------------------------------------------    
 #testcode om het verschil tussen de automata te laten zien
 x = game_of_life([[0]])
-x.evolueer()
+#x.evolueer()
 y = cellulair_automata()
-y.evolueer()  
+y.evolueer(2,2,np.zeros(shape=[2]*2))  
