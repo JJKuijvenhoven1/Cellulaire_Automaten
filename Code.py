@@ -6,11 +6,9 @@ class cellulair_automata():
         #Deze variablen staan nu op de standaardwaarden zodat het 
         #programma geen errors geeft maar kunnen bij de subclasses 
         #ingevoerd worden op wat ze moeten zijn.
-        self.dimensions     = 2
-        self.gridlength = 4
-        self.grid           = [0]
-        self.lisofneighbours = [0]
-        self.regels = 0
+        self.dimensions = 1
+        self.gridlength = 1
+        self.grid = np.zeros(shape=[self.dimensions]*self.gridlength)
                
     
     def evolueer_cel(self, coord_tuple):
@@ -37,29 +35,40 @@ class cellulair_automata():
         
         self.grid = nieuwe_grid
     
-#------------------------------------------------------------------------------        
-    
-    
+#------------------------------------------------------------------------------ 
+       
+class regel_30(cellulair_automata):
+    def __init__(self, startgrid):
+        #dit is een 1d CA ookwel regel 30 genoemnd
+        self.dimensions = 1
+        self.gridlength = len(startgrid)
+        self.grid = np.zeros(shape=[self.gridlength]*self.dimensions)
+        self.regel = '00011110'
         
-    
+    def evolueer_cel(self, coordtuple):
+        nieuwe_toestand = 0
+        return nieuwe_toestand
+        
+        
 #------------------------------------------------------------------------------    
     
     
-class game_of_life(cellulair_automata):
-    def __init__(self,startgrid):
-        self.dimensions     = 2
-        self.grid           = startgrid
-        self.lisofneighbours = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,-1]]
-        return
-    def regels(self,coordinaten):
-        print('this is the game of life')
-        nieuwetoestand = 0
-        return nieuwetoestand
+# class game_of_life(cellulair_automata):
+#     def __init__(self,startgrid):
+#         self.dimensions     = 2
+#         self.grid           = startgrid
+#         self.lisofneighbours = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,-1]]
+#         return
+#     def regels(self,coordinaten):
+#         print('this is the game of life')
+#         nieuwetoestand = 0
+#         return nieuwetoestand
         
 #-----------------------------------------------------------------------------    
 #testcode om het verschil tussen de automata te laten zien
-x = game_of_life([[0]])
-#x.evolueer()
-y = cellulair_automata()
-y.evolueer()  
+
+x = cellulair_automata()
+x.evolueer()  
+y = regel_30('10010101010101')
 print(y.grid)
+y.evolueer()
