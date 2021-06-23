@@ -41,7 +41,7 @@ class cellulair_automata():
                 coord_lijst.insert(0, 0)
             coord_tuple = tuple(coord_lijst)
             nieuwe_grid = evolueer_cel(coord_tuple, grid, nieuwe_grid)
-        return nieuwe_generatie
+        return nieuwe_grid
         
     
 #------------------------------------------------------------------------------    
