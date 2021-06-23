@@ -164,11 +164,12 @@ class game_of_life(cellulair_automata):
         #skip
         if midden == -1:
             return -1
-        #randvoorwaarden
+        
         buurtoestanden = []
         for buur in self.burenlijst:
             buurtoestanden.append(self.grid[tuple(np.array(buur)+np.array(coord_lijst))])
-        #nullen
+        
+        #randvoorwaarden
         for i in range(len(buurtoestanden)):
             if buurtoestanden[i] == -1:
                 buurtoestanden[i] = 0
@@ -188,7 +189,58 @@ class game_of_life(cellulair_automata):
         else:
             #stay the same
             return midden
+ 
+#------------------------------------------------------------------------------
+class kut_game2d(cellulair_automata()):
+    def __init__(self, startgrid, regels='000001110000000000',randvoorwaarden=0,burenlijst=[[-1,-1],[-1,0],[-1,1],[0,1],[1,1],[1,0],[1,-1],[0,-1]]):
+        self.dimensions = 2
+        self.gridlength = len(startgrid)+2
+        #we accepteren geen buren die 2 vakjes ver weg zijn. lekker puh
+        self.burenlijst = burenlijst
+        self.randvoorwaarden = randvoorwaarden
+        self.regels = regels
         
+        #start toestand invullen.
+        row = np.array([-1]*(self.gridlength-2))
+        collumn = np.array([-1]*self.gridlength)
+        startgrid = np.vstack([startgrid, row])
+        startgrid = np.vstack([row,startgrid])
+        startgrid = startgrid.transpose()
+        startgrid = np.vstack([startgrid,collumn])
+        startgrid = np.vstack([collumn,startgrid])
+        startgrid = startgrid.transpose()
+        self.grid = startgrid
+        
+    def evolueer_cel(self, coord_lijst):
+        midden = self.grid[tuple(coord_lijst)]
+        #skip
+        if midden == -1:
+            return -1
+        
+        buurtoestanden = []
+        for buur in self.burenlijst:
+            buurtoestanden.append(self.grid[tuple(np.array(buur)+np.array(coord_lijst))])
+        
+        #randvoorwaarden
+        for i in range(len(buurtoestanden)):
+            if buurtoestanden[i] == -1:
+                buurtoestanden[i] = 0
+               
+        #regels
+        aantallevendeburen = 0
+        for buurtoestand in buurtoestanden:
+            if buurtoestand == 1:
+                aantallevendeburen += 1 
+        
+        if (aantallevendeburen >= 4 or aantallevendeburen <= 1 )and midden == 1:
+            #DIE
+            return 0
+        elif aantallevendeburen == 3 and midden == 0:
+            #wordt geboren
+            return 1
+        else:
+            #stay the same
+            return midden
         
 
 
