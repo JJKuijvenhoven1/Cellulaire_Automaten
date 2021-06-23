@@ -78,7 +78,7 @@ class regel_30(cellulair_automata):
 #------------------------------------------------------------------------------ 
  
 class simple_life(cellulair_automata):
-    def __init__(self, startgrid, regelint=30, randvoorwaarden=2):
+    def __init__(self, startgrid, regelint=30, randvoorwaarden=0):
         #dit is een 1d CA ookwel regel 30 genoemnd
         #de randvoorwaarde is rondje
         self.dimensions = 1
@@ -157,7 +157,8 @@ class simple_life(cellulair_automata):
 
 x = cellulair_automata() 
 y = regel_30('000010000')
-z = simple_life('000010000', 204)
+z = simple_life('1000000000000000', 16)
+print(z.grid)
 for i in range(10):
     z.evolueer()
     print(z.grid)
