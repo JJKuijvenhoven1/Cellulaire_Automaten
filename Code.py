@@ -15,10 +15,24 @@ class cellulair_automata():
         return nieuwetoestand #we returnen de nieuwe toestand van het inputvakje
         
     
-    def evolueer(self):
-        #deze functie wordt door alle subclasses gebruikt en looped door elke entry
-        #van het grid en voert op dat vakje de functie regels uit
-        self.regels([0])
+    def evolueer_cel(coord_tuple, regels, grid, nieuwe_generatie):
+    nieuwe_generatie[coord_tuple] = 1
+
+    def evolueer(d, n, regels, grid):
+        nieuwe_generatie = np.zeros(shape=[n]*d)
+        for x in range(1, n**d):
+            coord_lijst = []
+            lengte_getal = math.floor(math.log(x, n))
+            rest = x
+            for z in range(lengte_getal + 1):
+                quotient = rest // n**(lengte_getal - z)
+                coord_lijst.append(quotient)
+                rest = rest - quotient * n**(lengte_getal - z)
+            while len(coord_lijst) < d:
+                coord_lijst.insert(0, 0)
+            coord_tuple = tuple(coord_lijst)
+            evolueer_cel(coord_tuple, regels, grid, nieuwe_generatie)
+        return nieuwe_generatie
         
     
 #------------------------------------------------------------------------------    
