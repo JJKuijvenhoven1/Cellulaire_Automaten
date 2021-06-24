@@ -300,12 +300,18 @@ class game_of_life(kut_game2d):
             return midden
 # -----------------------------------------------------------------------------
 # testcode om het verschil tussen de automata te laten zien
+size = 50
+dim = 2
+start = np.random.choice([0,1], size=[size]*dim,p=[.9,.1])
+
+
+
 
 x = cellulair_automata()
 y = regel_30('000010000')
 z = simple_life('1000000000000000', 50)
 a = game_of_life(np.ones([10]*2))
-b = kut_game2d(np.random.randint(2, size=(20,20)), burenlijst=[[1,0],[0,1],[-1,0],[0,-1]], birth=[2],death=[0,3,4])
+b = kut_game2d(start, birth=[0,1,2],death=[4,5],burenlijst=[[0,-1],[-1,-1],[1,-1],[-1,0],[-1,1]])
 
-b.evolueer_en_visualiseer(1000,0.1,1,1)
+b.evolueer_en_visualiseer(60,0.2,1,1)
 
