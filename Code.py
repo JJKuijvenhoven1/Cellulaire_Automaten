@@ -1,5 +1,6 @@
 import numpy as np
 import math
+import matplotlib.pyplot as plt
 
 
 class cellulair_automata():
@@ -35,7 +36,20 @@ class cellulair_automata():
                 nieuwe_grid[tuple(coord_lijst)] = self.evolueer_cel(coord_lijst)
 
             self.grid = nieuwe_grid
-
+    
+    def visualiseer(self):
+        pass
+        
+    def evolueer_en_visualiseer(self, iterations=1,showinbetween=True):
+        self.visualiseer()
+        for i in range(iterations):
+            self.evolueer()
+            if showinbetween:
+                self.visualiseer()
+        self.visualiseer()
+        
+        
+        
 
 # ------------------------------------------------------------------------------
 
@@ -263,6 +277,10 @@ class kut_game2d(cellulair_automata):
         positie = 2 * aantallevendeburen + int(midden)
 
         return int(self.regels[positie])
+    
+    def visualiseer(self):
+        self.grid
+        plt.imshow(self.grid)
 
 
 # -----------------------------------------------------------------------------
@@ -288,5 +306,5 @@ b = kut_game2d(np.array([
     [0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0]]))
 
-b.evolueer(20)
-print(b.grid)
+b.evolueer_en_visualiseer(10)
+
