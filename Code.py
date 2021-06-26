@@ -1,6 +1,7 @@
 import numpy as np
 import math
-
+import matplotlib.pyplot as plt
+import time
 
 class cellulair_automata():
     def __init__(self):
@@ -34,8 +35,30 @@ class cellulair_automata():
                     coord_lijst.insert(0, 0)
                 nieuwe_grid[tuple(coord_lijst)] = self.evolueer_cel(coord_lijst)
 
-            self.grid = nieuwe_grid
+            #vastlooppreventie
 
+
+
+
+            self.grid = nieuwe_grid
+    
+    def visualiseer(self):
+        pass
+        
+    def evolueer_en_visualiseer(self, iterations=1,timeperframe=0.5, showinbetween=True, showevery=1):
+        self.visualiseer()
+        
+        for i in range(iterations):
+            
+            self.evolueer()
+            time.sleep(timeperframe)
+            if showinbetween and i%showevery == 0:
+                self.visualiseer()
+            
+        
+        
+        
+        
 
 # ------------------------------------------------------------------------------
 
@@ -140,57 +163,6 @@ class simple_life(cellulair_automata):
         return nieuwe_toestand
 
 
-# ------------------------------------------------------------------------------
-
-
-class game_of_life(cellulair_automata):
-    def __init__(self, startgrid):
-        self.dimensions = 2
-        self.gridlength = len(startgrid) + 2
-        self.burenlijst = [[-1, -1], [-1, 0], [-1, 1], [0, 1], [1, 1], [1, 0], [1, -1], [0, -1]]
-
-        # start toestand invullen.
-        row = np.array([-1] * (self.gridlength - 2))
-        collumn = np.array([-1] * self.gridlength)
-        startgrid = np.vstack([startgrid, row])
-        startgrid = np.vstack([row, startgrid])
-        startgrid = startgrid.transpose()
-        startgrid = np.vstack([startgrid, collumn])
-        startgrid = np.vstack([collumn, startgrid])
-        startgrid = startgrid.transpose()
-        self.grid = startgrid
-
-    def evolueer_cel(self, coord_lijst):
-        midden = self.grid[tuple(coord_lijst)]
-        # skip
-        if midden == -1:
-            return -1
-
-        buurtoestanden = []
-        for buur in self.burenlijst:
-            buurtoestanden.append(self.grid[tuple(np.array(buur) + np.array(coord_lijst))])
-
-        # randvoorwaarden
-        for i in range(len(buurtoestanden)):
-            if buurtoestanden[i] == -1:
-                buurtoestanden[i] = 0
-
-        # regels
-        aantallevendeburen = 0
-        for buurtoestand in buurtoestanden:
-            if buurtoestand == 1:
-                aantallevendeburen += 1
-
-        if (aantallevendeburen >= 4 or aantallevendeburen <= 1) and midden == 1:
-            # DIE
-            return 0
-        elif aantallevendeburen == 3 and midden == 0:
-            # wordt geboren
-            return 1
-        else:
-            # stay the same
-            return midden
-
 
 # ------------------------------------------------------------------------------
 class kut_game2d(cellulair_automata):
@@ -263,30 +235,83 @@ class kut_game2d(cellulair_automata):
         positie = 2 * aantallevendeburen + int(midden)
 
         return int(self.regels[positie])
+    
+    def visualiseer(self):
+        
+        plt.axis('off')
+        scale = plt.Normalize(-1,1,False)
+                              
+        # plt.axis('tight')
+        # plt.axis('image')
+        plt.imshow(self.grid, norm=scale)
+        plt.show()
 
 
+
+# ------------------------------------------------------------------------------
+
+
+class game_of_life(kut_game2d):
+    def __init__(self, startgrid):
+        self.dimensions = 2
+        self.gridlength = len(startgrid) + 2
+        self.burenlijst = [[-1, -1], [-1, 0], [-1, 1], [0, 1], [1, 1], [1, 0], [1, -1], [0, -1]]
+
+        # start toestand invullen.
+        row = np.array([-1] * (self.gridlength - 2))
+        collumn = np.array([-1] * self.gridlength)
+        startgrid = np.vstack([startgrid, row])
+        startgrid = np.vstack([row, startgrid])
+        startgrid = startgrid.transpose()
+        startgrid = np.vstack([startgrid, collumn])
+        startgrid = np.vstack([collumn, startgrid])
+        startgrid = startgrid.transpose()
+        self.grid = startgrid
+
+    def evolueer_cel(self, coord_lijst):
+        midden = self.grid[tuple(coord_lijst)]
+        # skip
+        if midden == -1:
+            return -1
+
+        buurtoestanden = []
+        for buur in self.burenlijst:
+            buurtoestanden.append(self.grid[tuple(np.array(buur) + np.array(coord_lijst))])
+
+        # randvoorwaarden
+        for i in range(len(buurtoestanden)):
+            if buurtoestanden[i] == -1:
+                buurtoestanden[i] = 0
+
+        # regels
+        aantallevendeburen = 0
+        for buurtoestand in buurtoestanden:
+            if buurtoestand == 1:
+                aantallevendeburen += 1
+
+        if (aantallevendeburen >= 4 or aantallevendeburen <= 1) and midden == 1:
+            # DIE
+            return 0
+        elif aantallevendeburen == 3 and midden == 0:
+            # wordt geboren
+            return 1
+        else:
+            # stay the same
+            return midden
 # -----------------------------------------------------------------------------
 # testcode om het verschil tussen de automata te laten zien
+size = 50
+dim = 2
+start = np.random.choice([0,1], size=[size]*dim,p=[.9,.1])
+
+
+
 
 x = cellulair_automata()
 y = regel_30('000010000')
 z = simple_life('1000000000000000', 50)
-a = game_of_life(np.array([
-    [0, 1, 0, 0, 0, 0, 0],
-    [0, 0, 1, 0, 0, 0, 0],
-    [1, 1, 1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0]]))
-b = kut_game2d(np.array([
-    [0, 1, 0, 0, 0, 0, 0],
-    [0, 0, 1, 0, 0, 0, 0],
-    [1, 1, 1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0]]))
+a = game_of_life(np.ones([10]*2))
+b = kut_game2d(start, birth=[0,1,2],death=[4,5],burenlijst=[[0,-1],[-1,-1],[1,-1],[-1,0],[-1,1]])
 
-b.evolueer(20)
-print(b.grid)
+b.evolueer_en_visualiseer(60,0.2,1,1)
+
