@@ -120,6 +120,7 @@ class symmetrische_CA(cellulair_automaton):
         return int(self.regelcode[codepos])
         
 #------------------------------------------------------------------------------
+
 class symm_2d_CA(symmetrische_CA):
     def __init__(self,startgrid,randvoorwaarden,burenlijst,toestanden,regelcode):
         dimensions = 2
