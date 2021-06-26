@@ -24,14 +24,13 @@ class cellulair_automaton():
             nieuwe_grid = -2 * np.ones(shape=[n] * d)
             grid_met_index = np.nditer(self.grid, flags=["multi_index"])
             for x in grid_met_index:
-                print(grid_met_index.multi_index)
                 nieuwe_grid[grid_met_index.multi_index] = self.evolueer_cel(list(grid_met_index.multi_index))
 
             #update
             self.grid = nieuwe_grid
     
     def evolueer_cel(self, coords):
-        mycell = self.grid[tuple(coords)]
+        mycell = int(self.grid[tuple(coords)])
         buurtoestanden = self.buurtoestanden_en_randvoorwaarden(coords)
         return self.regels_toepassen(buurtoestanden, mycell)
     
@@ -99,7 +98,7 @@ class symmetrische_CA(cellulair_automaton):
         #codering 
         hoeveelvandezetoestand.pop(0)
         codepos = tuple(hoeveelvandezetoestand + [mycell])
-        print('codepos: '+str(codepos))
+        print(codepos)
         return int(self.regelcode[codepos])
         
 #------------------------------------------------------------------------------
@@ -108,8 +107,6 @@ class symm_2d_CA(symmetrische_CA):
         dimensions = 2
         super(symm_2d_CA,self).__init__(dimensions, startgrid, randvoorwaarden, burenlijst, toestanden, regelcode)
     
-    def visualiseer(self):
-        pass
 #------------------------------------------------------------------------------
 class game_of_life(symm_2d_CA):
     def __init__(self,startgrid,randvoorwaarden):
@@ -138,7 +135,7 @@ grid = np.array([[0,1,0,0,0,0,0,0,0,0],
                  [0,0,0,0,0,0,0,0,0,0],
                  ])
 a = game_of_life(grid, 0)
-a.evolueer_en_visualiseer(1)
+a.evolueer_en_visualiseer(2)
 
 
 
