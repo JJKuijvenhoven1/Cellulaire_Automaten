@@ -3,19 +3,71 @@ import math
 import matplotlib.pyplot as plt
 import time
 
+#dit is de standaard code waarvan alle CA's afgeleid zullen zijn.
 class cellulair_automata():
-    def __init__(self):
-        # Deze variablen staan nu op de standaardwaarden zodat het
-        # programma geen errors geeft maar kunnen bij de subclasses
-        # ingevoerd worden op wat ze moeten zijn.
-        self.dimensions = 1
-        self.gridlength = 1
-        self.grid = -1 * np.ones(shape=[self.dimensions] * self.gridlength)
+    def __init__(self,dimensions,startgrid,randvoorwaarden,burenlijst,regelcode):
+        
+        #save all relevant variables
+        self.dimensions = dimensions
+        self.gridlength = len(startgrid)
+        self.grid = startgrid
+        self.randvoorwaarden = randvoorwaarden
+        self.burenlijst = burenlijst
+        self.regelcode = regelcode
 
     def evolueer_cel(self, coord_lijst):
-        # Deze functie bestaat puur en alleen om door de child objecten overschreven te worden.
-        nieuwe_toestand = 1
-        return nieuwe_toestand
+        cell = self.grid[tuple(coord_lijst)]
+        # skip
+        if cell == -1:
+            return -1
+
+        buurtoestanden = []
+        for buurcoords in self.burenlijst:
+            #we checken eerst of dit wel binnen het grid valt
+            for i in range(len(buurcoords)):
+                if buurcoords[i] >= self.gridlength:
+                    # #dit betekent dat de ranvoorwaarden in werking gaan
+                    # if randvoorwaarden == 0:
+                    #     buurtoestanden.append(0)
+                    # elif randvoorwaarden == 1:
+                    #     buurtoestanden.append(1)
+                    # elif randvoorwaarden == 2:
+                    #     buurtoestanden.append
+                    pass
+            buurtoestanden.append(self.grid[tuple(np.array(buurcoords) + np.array(coord_lijst))])
+
+        # randvoorwaarden
+        if self.randvoorwaarden == 0:
+            # cirkeltje
+            print('HUILEN')
+            for i in range(len(buurtoestanden)):
+                if buurtoestanden[i] == -1:
+                    buurtoestanden[i] = 'cry yourself to sleep'
+        elif self.randvoorwaarden == 1:
+            # alles 0
+            for i in range(len(buurtoestanden)):
+                if buurtoestanden[i] == -1:
+                    buurtoestanden[i] = 0
+        elif self.randvoorwaarden == 2:
+            # alles 1
+            for i in range(len(buurtoestanden)):
+                if buurtoestanden[i] == -1:
+                    buurtoestanden[i] = 1
+        else:
+            print('dit is geen goede randvoorwaarde. Kies 0, 1 of 2')
+
+        # regels
+        aantallevendeburen = 0
+        for buurtoestand in buurtoestanden:
+            if buurtoestand == 1:
+                aantallevendeburen += 1
+        # plz geef uitleg:...
+        positie = 2 * aantallevendeburen + int(midden)
+
+        return int(self.regels[positie])
+    
+    def regels_toepassen(buurtoestanden):
+        return 1
 
     def evolueer(self, iterations=1):
         for i in range(iterations):
@@ -196,7 +248,7 @@ class kut_game2d(cellulair_automata):
             return -1
 
         buurtoestanden = []
-        for buur in self.burenlijst:
+        for buurcoords in self.burenlijst:
             buurtoestanden.append(self.grid[tuple(np.array(buur) + np.array(coord_lijst))])
 
         # randvoorwaarden
@@ -224,7 +276,7 @@ class kut_game2d(cellulair_automata):
         for buurtoestand in buurtoestanden:
             if buurtoestand == 1:
                 aantallevendeburen += 1
-                # plz geef uitleg:...
+        # plz geef uitleg:...
         positie = 2 * aantallevendeburen + int(midden)
 
         return int(self.regels[positie])
@@ -301,14 +353,16 @@ size = 50
 dim = 2
 start = np.random.choice([0,1], size=[size]*dim,p=[.9,.1])
 
+for i in range(50):
+    print (i)
+    if i >10:
+        break
 
+# x = cellulair_automata()
+# y = regel_30('000010000')
+# z = simple_life('1000000000000000', 50)
+# a = game_of_life(np.ones([10]*2))
+# b = kut_game2d(start, birth=[0,1],death=[4,5],burenlijst=[[0,-1],[-1,-1],[1,-1],[-1,0],[-1,1]])
 
-
-x = cellulair_automata()
-y = regel_30('000010000')
-z = simple_life('1000000000000000', 50)
-a = game_of_life(np.ones([10]*2))
-b = kut_game2d(start, birth=[0,1],death=[4,5],burenlijst=[[0,-1],[-1,-1],[1,-1],[-1,0],[-1,1]])
-
-b.evolueer_en_visualiseer(60,0.2,1,1)
+# b.evolueer_en_visualiseer(60,0.2,1,1)
 
