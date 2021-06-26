@@ -16,15 +16,24 @@ class cellulair_automaton():
         self.burenlijst = burenlijst
         self.regelcode = regelcode
         self.toestanden = toestanden
+   
+    def evolueer(self, iterations=1):
+        d = self.dimensions
+        n = self.gridlength
+        for i in range(iterations):
+            nieuwe_grid = -2 * np.ones(shape=[n] * d)
+            grid_met_index = np.nditer(self.grid, flags=["multi_index"])
+            for x in grid_met_index:
+                print(grid_met_index.multi_index)
+                nieuwe_grid[grid_met_index.multi_index] = self.evolueer_cel(list(grid_met_index.multi_index))
 
+            #update
+            self.grid = nieuwe_grid
+    
     def evolueer_cel(self, coords):
         mycell = self.grid[tuple(coords)]
         buurtoestanden = self.buurtoestanden_en_randvoorwaarden(coords)
         return self.regels_toepassen(buurtoestanden, mycell)
-    
-    def regels_toepassen(self,buurtoestanden,mycell):
-        #deze bestaat om overschreven te worden.
-        return 1
     
     def buurtoestanden_en_randvoorwaarden(self, coords):
         #de randvoorwaarden codatie is: -1 voor cirkeltje en 0123... enz zijn voor de hele rand die toestand 
@@ -41,51 +50,26 @@ class cellulair_automaton():
             else:
                 #reset randvoorwaarde
                 isoutofrange = False
-                
                 #we checken eerst of dit wel binnen het grid valt
                 for i in range(len(buurcoords)):
                     #we doen het voor elke individuele coordinaat
-                    if (buurcoords[i]+coords[i]) > self.gridlength:
+                    if (buurcoords[i]+coords[i]) >= self.gridlength or (buurcoords[i]+coords[i])<= -1:
                         #dit betekent dat de ranvoorwaarden in werking gaan
-                        isoutofrange == True
+                        isoutofrange = True
                         for toestand in self.toestanden:
                             if self.randvoorwaarden == toestand:
                                 buurtoestanden.append(toestand)
-                        if self.randvoorwaarden == self.toestanden[0]:
-                            buurtoestanden.append(1)
-                            isoutofrange = True
-                            break
-                        elif self.randvoorwaarden == 0: 
-                            buurtoestanden.append(0)
-                            isoutofrange = True
-                            break  
+                                break
                 # nu de verandering doorvoeren als we binnen de perken waren
                 if not isoutofrange:
                     buurtoestanden.append(self.grid[tuple(np.array(buurcoords) + np.array(coords))])
-             #end normalcase
+            #end normalcase
         #end for loop
         return buurtoestanden
 
-    def evolueer(self, iterations=1):
-        for i in range(iterations):
-            d = self.dimensions
-            n = self.gridlength
-            nieuwe_grid = -2 * np.ones(shape=[n] * d)
-            nieuwe_grid[(0,) * d] = self.evolueer_cel([0] * d)
-            for x in range(1, n ** d):
-                coord_lijst = []
-                lengte_getal = math.floor(math.log(x, n))
-                rest = x
-                for z in range(lengte_getal + 1):
-                    quotient = rest // n ** (lengte_getal - z)
-                    coord_lijst.append(quotient)
-                    rest = rest - quotient * n ** (lengte_getal - z)
-                while len(coord_lijst) < d:
-                    coord_lijst.insert(0, 0)
-                nieuwe_grid[tuple(coord_lijst)] = self.evolueer_cel(coord_lijst)
-
-            #update
-            self.grid = nieuwe_grid
+    def regels_toepassen(self,buurtoestanden,mycell):
+        #deze bestaat om overschreven te worden.
+        return 1
     
     def visualiseer(self):
         print(self.grid)
@@ -110,13 +94,13 @@ class symmetrische_CA(cellulair_automaton):
             hoeveelvandezetoestand.append(0)
         for buur_t in buurtoestanden:
             for t in self.toestanden:
-                print(t)
                 if buur_t == t:
                     hoeveelvandezetoestand[t]+= 1
         #codering 
         hoeveelvandezetoestand.pop(0)
-        codepos = tuple(hoeveelvandezetoestand + mycell)
-        return self.regelcode[codepos]
+        codepos = tuple(hoeveelvandezetoestand + [mycell])
+        print('codepos: '+str(codepos))
+        return int(self.regelcode[codepos])
         
 #------------------------------------------------------------------------------
 class symm_2d_CA(symmetrische_CA):
@@ -154,7 +138,7 @@ grid = np.array([[0,1,0,0,0,0,0,0,0,0],
                  [0,0,0,0,0,0,0,0,0,0],
                  ])
 a = game_of_life(grid, 0)
-a.evolueer_en_visualiseer(10)
+a.evolueer_en_visualiseer(1)
 
 
 
