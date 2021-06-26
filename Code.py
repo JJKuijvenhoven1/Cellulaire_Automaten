@@ -40,11 +40,12 @@ class cellulair_automaton():
         for buurcoords in self.burenlijst:
             #special case ranvoorwaarden == cirkeltje
             if self.randvoorwaarden == -1:
-                cirkelcoords = coords
+                #oke de tactiek is om uit te rekenen waar je cirkello.vakje is 
+                cirkelcoords = [0]*self.dimensions
                 for i in range(len(buurcoords)):
                     cirkelcoords[i] = (coords[i]+buurcoords[i])%self.gridlength
                 buurtoestanden.append(self.grid[tuple(np.array(cirkelcoords))])
-                
+            #end specialcase    
             #normalcase    
             else:
                 #reset randvoorwaarde
@@ -98,7 +99,6 @@ class symmetrische_CA(cellulair_automaton):
         #codering 
         hoeveelvandezetoestand.pop(0)
         codepos = tuple(hoeveelvandezetoestand + [mycell])
-        print(codepos)
         return int(self.regelcode[codepos])
         
 #------------------------------------------------------------------------------
@@ -107,6 +107,15 @@ class symm_2d_CA(symmetrische_CA):
         dimensions = 2
         super(symm_2d_CA,self).__init__(dimensions, startgrid, randvoorwaarden, burenlijst, toestanden, regelcode)
     
+    def visualiseer(self):
+        plt.axis('off')
+        scale = plt.Normalize(-1,1,False)
+                              
+        # plt.axis('tight')
+        # plt.axis('image')
+        plt.imshow(self.grid, norm=scale)
+        plt.show()
+        
 #------------------------------------------------------------------------------
 class game_of_life(symm_2d_CA):
     def __init__(self,startgrid,randvoorwaarden):
@@ -117,13 +126,19 @@ class game_of_life(symm_2d_CA):
 
 #------------------------------------------------------------------------------
 
+
+
+
+
+#--------------------------------------------------------------
+
 class onsymmetrische_CA(cellulair_automaton):
     
     def regels_toepassen(self, buurtoestanden, mycell):
         pass
 
 #------------------------------------------------------------------------------
-grid = np.array([[0,1,0,0,0,0,0,0,0,0],
+glider = np.array([[0,1,0,0,0,0,0,0,0,0],
                  [0,0,1,0,0,0,0,0,0,0],
                  [1,1,1,0,0,0,0,0,0,0],
                  [0,0,0,0,0,0,0,0,0,0],
@@ -134,8 +149,29 @@ grid = np.array([[0,1,0,0,0,0,0,0,0,0],
                  [0,0,0,0,0,0,0,0,0,0],
                  [0,0,0,0,0,0,0,0,0,0],
                  ])
-a = game_of_life(grid, 0)
-a.evolueer_en_visualiseer(2)
+loafer = np.array([[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                   [0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,0,0,0,0,0],
+                   [0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0],
+                   [0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,1,0,0,0],
+                   [0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,0,0],
+                   [0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0],
+                   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0],
+                   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0],
+                   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,0],
+                   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0],
+                   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0],
+                   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                   ])
+a = game_of_life(loafer, -1)
+a.evolueer_en_visualiseer(200,0.3)
 
 
 
