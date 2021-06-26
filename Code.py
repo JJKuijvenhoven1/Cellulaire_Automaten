@@ -186,15 +186,8 @@ class kut_game2d(cellulair_automata):
             print('jonathan boos :(')
 
         # start toestand invullen.
-        row = np.array([-1] * (self.gridlength - 2))
-        collumn = np.array([-1] * self.gridlength)
-        startgrid = np.vstack([startgrid, row])
-        startgrid = np.vstack([row, startgrid])
-        startgrid = startgrid.transpose()
-        startgrid = np.vstack([startgrid, collumn])
-        startgrid = np.vstack([collumn, startgrid])
-        startgrid = startgrid.transpose()
-        self.grid = startgrid
+        self.grid = -1*np.ones(shape=[len(startgrid)+2]*2)
+        self.grid[1:-1,1:-1] = startgrid
 
     def evolueer_cel(self, coord_lijst):
         midden = self.grid[tuple(coord_lijst)]
@@ -299,6 +292,10 @@ class game_of_life(kut_game2d):
             # stay the same
             return midden
 # -----------------------------------------------------------------------------
+def tree_dimensions(cellulair_automata):
+    def __init__(self):
+        pass
+#------------------------------------------------------------------------------
 # testcode om het verschil tussen de automata te laten zien
 size = 50
 dim = 2
@@ -311,7 +308,7 @@ x = cellulair_automata()
 y = regel_30('000010000')
 z = simple_life('1000000000000000', 50)
 a = game_of_life(np.ones([10]*2))
-b = kut_game2d(start, birth=[0,1,2],death=[4,5],burenlijst=[[0,-1],[-1,-1],[1,-1],[-1,0],[-1,1]])
+b = kut_game2d(start, birth=[0,1],death=[4,5],burenlijst=[[0,-1],[-1,-1],[1,-1],[-1,0],[-1,1]])
 
 b.evolueer_en_visualiseer(60,0.2,1,1)
 
