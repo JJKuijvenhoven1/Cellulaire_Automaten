@@ -119,43 +119,19 @@ class symmetrische_CA(cellulair_automaton):
         codepos = tuple(hoeveelvandezetoestand + [mycell])
         return int(self.regelcode[codepos])
         
+       
 #------------------------------------------------------------------------------
-
-class symm_2d_CA(symmetrische_CA):
-    def __init__(self,startgrid,randvoorwaarden,burenlijst,toestanden,regelcode):
-        dimensions = 2
-        super(symm_2d_CA,self).__init__(dimensions, startgrid, randvoorwaarden, burenlijst, toestanden, regelcode)
-    
-    def visualiseer(self):
-        plt.axis('off')
-        scale = plt.Normalize(-1,1,False)
-                              
-        # plt.axis('tight')
-        # plt.axis('image')
-        plt.imshow(self.grid, norm=scale)
-        plt.show()
-        
-#------------------------------------------------------------------------------
-class game_of_life(symm_2d_CA):
+class game_of_life(symmetrische_CA):
     def __init__(self,startgrid,randvoorwaarden):
+        dimensions = 2
         burenlijst = [[1,1],[1,0],[1,-1],[0,-1],[-1,-1],[-1,0],[-1,1],[0,1]]
         toestanden = [0,1]
         regelcode = np.array([[0,0],[0,0],[0,1],[1,1],[0,0],[0,0],[0,0],[0,0],[0,0]])
-        super(game_of_life,self).__init__(startgrid, randvoorwaarden, burenlijst, toestanden, regelcode)
+        super(game_of_life,self).__init__(dimensions, startgrid, randvoorwaarden, burenlijst, toestanden, regelcode)
 
 #------------------------------------------------------------------------------
-
-class symm_1d_CA(symmetrische_CA):
-    def __init__(self,startgrid,randvoorwaarden, burenlijst, toestanden, regelcode):
-        dimensions = 1
-        super(symm_2d_CA,self).__init__(dimensions, startgrid, randvoorwaarden, burenlijst, toestanden, regelcode)
-    
-    def visualiseer(self):
-        pass
-
-
-
 #------------------------------------------------------------------------------
+
 
 class onsymmetrische_CA(cellulair_automaton):
     
@@ -165,23 +141,16 @@ class onsymmetrische_CA(cellulair_automaton):
             totaletoestand += buurtoestanden[i]*(len(self.toestanden))**i
         return self.regelcode[totaletoestand]
 
-#------------------------------------------------------------------------------            
-
-class onsym_1d_CA(onsymmetrische_CA):
-    def __init__(self, startgrid, randvoorwaarden, burenlijst, toestanden, regelcode):
-        dimensions = 1
-        super(onsymmetrische_CA,self).__init__(dimensions, startgrid, randvoorwaarden, burenlijst, toestanden, regelcode)
-        
-    
     
 #------------------------------------------------------------------------------
 
-class regel30(onsym_1d_CA):
+class regel30(onsymmetrische_CA):
     def __init__(self,startgrid,randvoorwaarden):
+        dimensions = 1
         burenlijst = [[1],[0],[-1]]
         toestanden = [0,1]
         regelcode = [0,1,1,1,1,0,0,0]
-        super(regel30,self).__init__(startgrid, randvoorwaarden, burenlijst, toestanden, regelcode)
+        super(regel30,self).__init__(dimensions, startgrid, randvoorwaarden, burenlijst, toestanden, regelcode)
         
 #------------------------------------------------------------------------------
 glider = np.array([[0,1,0,0,0,0,0,0,0,0],
@@ -218,10 +187,8 @@ loafer = np.array([[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                    ])
 a = game_of_life(glider,-1)
 b = game_of_life(loafer, -1)
-c = onsym_1d_CA(np.array([0,0,0,0,1,0,0,0,0]),-1,[[1],[0],[-1]],[0,1],[0,1,1,1,1,0,0,0])
-d = onsym_1d_CA(np.array([0,0,0,0,1,0,0,0,0]),-1,[[1],[0],[-1]],[0,1],[0,0,0,0,1,0,0,0])
-e = onsym_1d_CA(np.array([1,0,1,0,1,0,1,0,1]),0,[[1],[0],[-1]],[0,1],[0,1,0,0,1,1,0,0])
-e.evolueer_en_visualiseer(30)
+
+b.evolueer_en_visualiseer(30)
 
 
 
@@ -249,8 +216,30 @@ e.evolueer_en_visualiseer(30)
 
 
 
+# class onsym_1d_CA(onsymmetrische_CA):
+#     def __init__(self, startgrid, randvoorwaarden, burenlijst, toestanden, regelcode):
+#         dimensions = 1
+#         super(onsymmetrische_CA,self).__init__(dimensions, startgrid, randvoorwaarden, burenlijst, toestanden, regelcode)
+        
+    
 
 
+#------------------------------------------------------------------------------
+
+# class symm_2d_CA(symmetrische_CA):
+#     def __init__(self,startgrid,randvoorwaarden,burenlijst,toestanden,regelcode):
+#         dimensions = 2
+#         super(symm_2d_CA,self).__init__(dimensions, startgrid, randvoorwaarden, burenlijst, toestanden, regelcode)
+    
+#     def visualiseer(self):
+#         plt.axis('off')
+#         scale = plt.Normalize(-1,1,False)
+                              
+#         # plt.axis('tight')
+#         # plt.axis('image')
+#         plt.imshow(self.grid, norm=scale)
+#         plt.show()
+ 
 # class regel_30(cellulair_automata):
 #     def __init__(self, startgrid):
 #         # dit is een 1d CA ookwel regel 30 genoemnd
