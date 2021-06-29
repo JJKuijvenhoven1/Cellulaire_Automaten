@@ -152,6 +152,9 @@ class regel30(onsymmetrische_CA):
         super(regel30,self).__init__(dimensions, startgrid, randvoorwaarden, burenlijst, toestanden, regelcode)
         
 #------------------------------------------------------------------------------
+#Unit tests
+#test matrices
+
 glider = np.array([[0,1,0,0,0,0,0,0,0,0],
                  [0,0,1,0,0,0,0,0,0,0],
                  [1,1,1,0,0,0,0,0,0,0],
@@ -163,6 +166,10 @@ glider = np.array([[0,1,0,0,0,0,0,0,0,0],
                  [0,0,0,0,0,0,0,0,0,0],
                  [0,0,0,0,0,0,0,0,0,0],
                  ])
+glidergof = game_of_life(glider,-1) #gof = game of life
+# glidergof.evolueer_en_visualiseer(30,0.4)
+#Hier testen we de basic game of life functies met rondgaande randvoorwaarden
+#----------------------------------------------------------------------------
 loafer = np.array([[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -184,10 +191,15 @@ loafer = np.array([[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                    ])
-a = game_of_life(glider,-1)
-b = game_of_life(loafer, -1)
+loafergof = game_of_life(loafer, 0)
+# loafergof.evolueer_en_visualiseer(30,0.4)
+#hier testen we de rand = 0 randvoorwaarde. De Loafer sterf tegen de rand aan.
 
-b.evolueer_en_visualiseer(30)
+opdrachtvoorbeeld = np.array([0,0,0,0,1,0,0,0,0])
+opdrachtvoorbeeldr30 = regel30(opdrachtvoorbeeld, 0)
+opdrachtvoorbeeldr30.evolueer_en_visualiseer(30,0.4)
+
+
 
 
 
