@@ -88,6 +88,7 @@ class cellulair_automaton():
             
         else:
             print(self.grid)
+            print('---------------------')
 
         
     def evolueer_en_visualiseer(self, iterations=1,timeperframe=0.5, showinbetween=True, showevery=1):
@@ -119,7 +120,7 @@ class symmetrische_CA(cellulair_automaton):
         return int(self.regelcode[codepos])
         
        
-#------------------------------------------------------------------------------
+
 class game_of_life(symmetrische_CA):
     def __init__(self,startgrid,randvoorwaarden):
         dimensions = 2
@@ -127,8 +128,28 @@ class game_of_life(symmetrische_CA):
         toestanden = [0,1]
         regelcode = np.array([[0,0],[0,0],[0,1],[1,1],[0,0],[0,0],[0,0],[0,0],[0,0]])
         super(game_of_life,self).__init__(dimensions, startgrid, randvoorwaarden, burenlijst, toestanden, regelcode)
+        
+class simpele_hoger_dimensionaale_CA(symmetrische_CA):
+    def __init__(self, dimensions):
+        startgrid = 0
+        for n in range(dimensions):
+            startgrid =[startgrid,startgrid,startgrid]
+        startgrid = np.array(startgrid)
+        startgrid[tuple([1]*dimensions)] = 1       
+        randvoorwaarden = 0
+        burenlijst = []
+        for n in range(dimensions):
+            buurpos = [0]*dimensions
+            buurneg = [0]*dimensions
+            buurpos[n] = 1
+            buurneg[n] = -1    
+            burenlijst += [buurpos,buurneg]
+        toestanden = [0,1]
+        regelcode = np.array([[0,1]] + [[1,1]]*len(burenlijst))
+        print(regelcode)
+        
+        super(simpele_hoger_dimensionaale_CA,self).__init__(dimensions, startgrid, randvoorwaarden, burenlijst, toestanden, regelcode)
 
-#------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
 
 
@@ -141,7 +162,7 @@ class onsymmetrische_CA(cellulair_automaton):
         return self.regelcode[totaletoestand]
 
     
-#------------------------------------------------------------------------------
+
 
 class regel30(onsymmetrische_CA):
     def __init__(self,startgrid,randvoorwaarden):
@@ -152,8 +173,8 @@ class regel30(onsymmetrische_CA):
         super(regel30,self).__init__(dimensions, startgrid, randvoorwaarden, burenlijst, toestanden, regelcode)
         
 #------------------------------------------------------------------------------
-#Unit tests
-#test matrices
+#UNIT TESTS
+#------------------------------------------------------------------------------
 
 glider = np.array([[0,1,0,0,0,0,0,0,0,0],
                  [0,0,1,0,0,0,0,0,0,0],
@@ -169,7 +190,7 @@ glider = np.array([[0,1,0,0,0,0,0,0,0,0],
 glidergof = game_of_life(glider,-1) #gof = game of life
 # glidergof.evolueer_en_visualiseer(30,0.4)
 #Hier testen we de basic game of life functies met rondgaande randvoorwaarden
-#----------------------------------------------------------------------------
+
 loafer = np.array([[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -197,14 +218,41 @@ loafergof = game_of_life(loafer, 0)
 
 opdrachtvoorbeeld = np.array([0,0,0,0,1,0,0,0,0])
 opdrachtvoorbeeldr30 = regel30(opdrachtvoorbeeld, 0)
-opdrachtvoorbeeldr30.evolueer_en_visualiseer(30,0.4)
+# opdrachtvoorbeeldr30.evolueer_en_visualiseer(30,0.4)
+#hier zien we dat de regel30 uit het voorbeeld goed werkt. 
 
+driedee = np.array([
+                    [[0,0,0],[0,0,0],[0,0,0]],
+                    [[0,0,0],[0,1,0],[0,0,0]],
+                    [[0,0,0],[0,0,0],[0,0,0]],
+                    ])
+driedeeburen = [[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]]
+driedeeregels = np.array([[0,1],[1,1],[1,1],[1,1],[1,1],[1,1],[1,1]])
+driedeeCA = symmetrische_CA(3, driedee, 0, driedeeburen, [0,1], driedeeregels)
+# driedeeCA.evolueer_en_visualiseer(5)
+#dit is een super basic 3 dimensionaal Cellulair automaton om aan te tonen dat het werkt. het zou zich moeten opvullen
+# via een zeer basic patroon namelijk als een van buren 1 is wordt ik dat ook. De buren zijn daarbij ingesteld als alles 
+#waar elke kubus een vlak mee deelt, ofwel niet schuin. 
 
+vierdee = np.array([
+                    [[[0,0,0],[0,0,0],[0,0,0]],[[0,0,0],[0,0,0],[0,0,0]],[[0,0,0],[0,0,0],[0,0,0]]],
+                    [[[0,0,0],[0,0,0],[0,0,0]],[[0,0,0],[0,1,0],[0,0,0]],[[0,0,0],[0,0,0],[0,0,0]]],
+                    [[[0,0,0],[0,0,0],[0,0,0]],[[0,0,0],[0,0,0],[0,0,0]],[[0,0,0],[0,0,0],[0,0,0]]],
+                    ])
+vierdeeburen = [[1,0,0,0],[-1,0,0,0],[0,1,0,0],[0,-1,0,0],[0,0,1,0],[0,0,-1,0],[0,0,0,1],[0,0,0,-1]]
+vierdeeregels = np.array([[0,1],[1,1],[1,1],[1,1],[1,1],[1,1],[1,1],[1,1],[1,1]])
+vierdeeCA = symmetrische_CA(4, vierdee, 0, vierdeeburen, [0,1], vierdeeregels)
+# vierdeeCA.evolueer_en_visualiseer(5)
+#Hier weer hetzelfde super basic cellulair automaton alleen dan in vier dimensies. Hieraan kunnen we goed zien dat het 
+#snel te complext wordt om nog nuttig te zijn als we in hogere dimensies gaan werken
 
+#op de hierboven beschreven unit tests hebben we nog een klasse gebaseerd, de simpele hoger dimensionale CA die voor 
+#een gegeven dimensie precies zon CA maakt.
 
-
-
-
+vijfdee = simpele_hoger_dimensionaale_CA(5)
+# vijfdee.evolueer_en_visualiseer(5)
+# wat we zien is dat 5d erg slecht te visualiseren valt. Wat verder ook opvalt is dat elke dimensie die je toevoegt 
+# ervoor zorgt dat je een extra stap nodig hebt om alle posities 1 te maken.
 
 
 
