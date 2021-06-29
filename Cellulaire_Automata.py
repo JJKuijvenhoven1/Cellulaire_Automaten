@@ -254,6 +254,12 @@ vijfdee = simpele_hoger_dimensionaale_CA(5)
 # wat we zien is dat 5d erg slecht te visualiseren valt. Wat verder ook opvalt is dat elke dimensie die je toevoegt 
 # ervoor zorgt dat je een extra stap nodig hebt om alle posities 1 te maken.
 
+string_theory = simpele_hoger_dimensionaale_CA(10)
+string_theory.evolueer_en_visualiseer(1)
+#en hier zien we het probleem met hogere dimensies nog eens verder uit gebreid. als eerste is visualisatie
+#problematisch en als tweede wordt de rekentijd erg hoog. dit heeft lengte 3 maar vanwege de hoge dimensie
+#is het aantal vakje gelijk aan 3**10 = 59049!!!
+
 
 
 
