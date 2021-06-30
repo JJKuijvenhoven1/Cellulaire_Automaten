@@ -164,6 +164,17 @@ class onsymmetrische_CA(cellulair_automaton):
         for i in range(len(buurtoestanden)):
             totaletoestand += buurtoestanden[i]*(len(self.toestanden))**i
         return self.regelcode[totaletoestand]
+    
+    def regelconverter(self, integer):
+        pass
+    
+class customregel(onsymmetrische_CA):
+    def __init__(self,startgrid,randvoorwaarden,regelcode):
+        dimensions = 1
+        burenlijst = [[1],[0],[-1]]
+        toestanden = [0,1]
+        super(regel30,self).__init__(dimensions, startgrid, randvoorwaarden, burenlijst, toestanden, regelcode)
+
 
     
 
@@ -192,7 +203,7 @@ glider = np.array([[0,1,0,0,0,0,0,0,0,0],
                  [0,0,0,0,0,0,0,0,0,0],
                  ])
 glidergof = game_of_life(glider,-1) #gof = game of life
-# glidergof.evolueer_en_visualiseer(30,0.4)
+glidergof.evolueer_en_visualiseer(30,0.4)
 #Hier testen we de basic game of life functies met rondgaande randvoorwaarden
 
 loafer = np.array([[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -217,7 +228,7 @@ loafer = np.array([[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                    ])
 loafergof = game_of_life(loafer, 0)
-# loafergof.evolueer_en_visualiseer(30,0.4)
+loafergof.evolueer_en_visualiseer(30,0.4)
 #hier testen we de rand = 0 randvoorwaarde. De Loafer sterf tegen de rand aan.
 
 opdrachtvoorbeeld = np.array([0,0,0,0,1,0,0,0,0])
