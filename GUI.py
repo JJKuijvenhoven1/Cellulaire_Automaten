@@ -142,25 +142,27 @@ def new_1D_window(lengte, iteraties, randvoorwaarde, showevery):
     
     magie_1D(lengte)
     
-    def enter_1D(sg, it, rv, se):
-        print("Het startgrid is: ")
-        print(sg)
-        print("Het aantal iteraties is: " + str(it))
-        print("De randvoorwaarden zijn: " + str(rv))
-        print("Om de hoeveel wordt geshowt: " + str(se))
-    
-    Enter_1D = Button(window, bg="red", text="Enter")
-    Enter_1D.grid(column=0, row=0, sticky=N+S+E+W)
-    Enter_1D["command"] = lambda startgrid=startgrid, iteraties=iteraties, randvoorwaarde=randvoorwaarde, showevery=showevery: enter_1D(startgrid, iteraties, randvoorwaarde, showevery)
-    
-    for y in range(lengte+2):
-        Grid.columnconfigure(window, y, weight=1)
-    
     regel_var = StringVar()
     regel_invoer = Entry(window, textvariable=regel_var)
     regel_invoer.grid(row=2, column=0)
     regel_label = Label(window, text="Welke regel wil je gebruiken? ")
     regel_label.grid(row=1, column=0)
+    
+    def enter_1D(sg, it, rv, se, regel):
+        print("Het startgrid is: ")
+        print(sg)
+        print("Het aantal iteraties is: " + str(it))
+        print("De randvoorwaarden zijn: " + str(rv))
+        print("Om de hoeveel wordt geshowt: " + str(se))
+        print("De regel is: " + regel_var.get())
+    
+    Enter_1D = Button(window, bg="red", text="Enter")
+    Enter_1D.grid(column=0, row=0, sticky=N+S+E+W)
+    Enter_1D["command"] = lambda startgrid=startgrid, iteraties=iteraties, randvoorwaarde=randvoorwaarde, showevery=showevery, regel=regel_var.get(): enter_1D(startgrid, iteraties, randvoorwaarde, showevery, regel)
+    
+    for y in range(lengte+2):
+        Grid.columnconfigure(window, y, weight=1)
+    
 
     
 
