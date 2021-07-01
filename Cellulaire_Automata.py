@@ -95,14 +95,14 @@ class cellulair_automaton():
             print('---------------------')
 
         
-    def evolueer_en_visualiseer(self, iterations=1,timeperframe=0.5, showinbetween=True, showevery=1):
+    def evolueer_en_visualiseer(self, iterations=1,timeperframe=0.5, showevery=1):
         self.visualiseer()
         
         for i in range(iterations):
             
             self.evolueer()
             time.sleep(timeperframe)
-            if showinbetween and i%showevery == 0:
+            if i%showevery == 0:
                 self.visualiseer()
             
 
@@ -166,7 +166,12 @@ class onsymmetrische_CA(cellulair_automaton):
         return self.regelcode[totaletoestand]
     
     def regelconverter(self, integer):
-        pass
+        output = [0]*(len(self.toestanden)**len(self.burenlijst))
+        binary = str(bin(integer))
+        binary = binary[2:]
+        for i in range(len(binary)):
+            output[i]=int(binary[-i-1])
+
     
 class customregel(onsymmetrische_CA):
     def __init__(self,startgrid,randvoorwaarden,regelcode):
@@ -174,10 +179,6 @@ class customregel(onsymmetrische_CA):
         burenlijst = [[1],[0],[-1]]
         toestanden = [0,1]
         super(regel30,self).__init__(dimensions, startgrid, randvoorwaarden, burenlijst, toestanden, regelcode)
-
-
-    
-
 
 class regel30(onsymmetrische_CA):
     def __init__(self,startgrid,randvoorwaarden):
@@ -203,7 +204,7 @@ glider = np.array([[0,1,0,0,0,0,0,0,0,0],
                  [0,0,0,0,0,0,0,0,0,0],
                  ])
 glidergof = game_of_life(glider,-1) #gof = game of life
-glidergof.evolueer_en_visualiseer(30,0.4)
+# glidergof.evolueer_en_visualiseer(30,0.4)
 #Hier testen we de basic game of life functies met rondgaande randvoorwaarden
 
 loafer = np.array([[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -228,7 +229,7 @@ loafer = np.array([[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                    ])
 loafergof = game_of_life(loafer, 0)
-loafergof.evolueer_en_visualiseer(30,0.4)
+# loafergof.evolueer_en_visualiseer(30,0.4)
 #hier testen we de rand = 0 randvoorwaarde. De Loafer sterf tegen de rand aan.
 
 opdrachtvoorbeeld = np.array([0,0,0,0,1,0,0,0,0])
@@ -275,7 +276,7 @@ string_theory = simpele_hoger_dimensionaale_CA(10)
 #problematisch en als tweede wordt de rekentijd erg hoog. dit heeft lengte 3 maar vanwege de hoge dimensie
 #is het aantal vakje gelijk aan 3**10 = 59049!!!
 
-
+opdrachtvoorbeeldr30.regelconverter(30)
 
 
 
