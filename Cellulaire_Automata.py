@@ -183,7 +183,9 @@ class customregel(onsymmetrische_CA):
         dimensions = 1
         burenlijst = [[1],[0],[-1]]
         toestanden = [0,1]
-        super(customregel,self).__init__(dimensions, startgrid, randvoorwaarden, burenlijst, toestanden, self.regelconverter(regelcode))
+        super(customregel,self).__init__(dimensions, startgrid, randvoorwaarden, burenlijst, toestanden, regelcode)
+        self.regelcode = self.regelconverter(self.regelcode)
+        
 
 class regel30(onsymmetrische_CA):
     def __init__(self,startgrid,randvoorwaarden):
@@ -239,7 +241,7 @@ loafergof = game_of_life(loafer, 0)
 
 opdrachtvoorbeeld = np.array([0,0,0,0,1,0,0,0,0])
 opdrachtvoorbeeldr30 = regel30(opdrachtvoorbeeld, 0)
-opdrachtvoorbeeldr30.evolueer_en_visualiseer(30,0.4)
+# opdrachtvoorbeeldr30.evolueer_en_visualiseer(30,0.4)
 #hier zien we dat de regel30 uit het voorbeeld goed werkt. 
 
 driedee = np.array([
@@ -283,8 +285,8 @@ string_theory = simpele_hoger_dimensionaale_CA(10)
 
 # print(opdrachtvoorbeeldr30.regelconverter(30))
 
-custom1dCA = customregel([0,0,0,0,1,0,0,0,0],0,30)
-custom1dCA.evolueer_en_visualiseer(0.4)
+custom1dCA = customregel(np.array([0,0,0,0,1,0,0,0,0]),0,30)
+# custom1dCA.evolueer_en_visualiseer(15,0.4)
 
 
 

@@ -115,11 +115,11 @@ def new_1D_window(lengte, iteraties, randvoorwaarde, showevery):
         if btn["bg"] == "cyan":
             btn["bg"] = "yellow"
             startgrid[x-2] = 1
-            print(startgrid)
+
         elif btn["bg"] == "yellow":
             btn["bg"] = "cyan"
             startgrid[x-2] = 0
-            print(startgrid)
+
     
     def magie_1D(lengte):
         for x in range(2,lengte+2):
@@ -138,14 +138,15 @@ def new_1D_window(lengte, iteraties, randvoorwaarde, showevery):
     regel_label = Label(window, text="Welke regel wil je gebruiken? ")
     regel_label.grid(row=1, column=0)
     
-    def enter_1D(sg, it, rv, se, regel):
-        custom = ca.customregel(startgrid=sg, randvoorwaarden=rv, regelcode=regel)
+    def enter_1D(sg, it, rv, se, regels):
+        custom = ca.customregel(startgrid=sg, randvoorwaarden=rv, regelcode=int(regels.get()))
         custom.evolueer_en_visualiseer(iterations=it, showevery=se)
         
     
     Enter_1D = Button(window, bg="red", text="Enter")
     Enter_1D.grid(column=0, row=0, sticky=N+S+E+W)
-    Enter_1D["command"] = lambda startgrid=startgrid, iteraties=iteraties, randvoorwaarde=randvoorwaarde, showevery=showevery, regel=regel_var.get(): enter_1D(startgrid, iteraties, randvoorwaarde, showevery, regel)
+    
+    Enter_1D["command"] = lambda startgrid=startgrid, iteraties=iteraties, randvoorwaarde=randvoorwaarde, showevery=showevery, regels=regel_var: enter_1D(startgrid, iteraties, randvoorwaarde, showevery, regels)
     
     for y in range(lengte+2):
         Grid.columnconfigure(window, y, weight=1)
