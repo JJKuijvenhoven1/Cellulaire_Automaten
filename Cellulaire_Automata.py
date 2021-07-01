@@ -172,6 +172,7 @@ class onsymmetrische_CA(cellulair_automaton):
         binary = binary[2:]
         for i in range(len(binary)):
             output[i]=int(binary[-i-1])
+        return output
 
     
 class customregel(onsymmetrische_CA):
