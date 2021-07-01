@@ -84,6 +84,7 @@ class cellulair_automaton():
             plt.axis('off')
             scale = plt.Normalize(-1,1,False)
             plt.imshow(visual_grid, norm=scale)
+            plt.figure()
             plt.show()
         elif self.dimensions == 2:
             plt.axis('off')
@@ -180,7 +181,7 @@ class customregel(onsymmetrische_CA):
         dimensions = 1
         burenlijst = [[1],[0],[-1]]
         toestanden = [0,1]
-        super(regel30,self).__init__(dimensions, startgrid, randvoorwaarden, burenlijst, toestanden, regelcode)
+        super(customregel,self).__init__(dimensions, startgrid, randvoorwaarden, burenlijst, toestanden, regelcode)
 
 class regel30(onsymmetrische_CA):
     def __init__(self,startgrid,randvoorwaarden):
@@ -236,7 +237,7 @@ loafergof = game_of_life(loafer, 0)
 
 opdrachtvoorbeeld = np.array([0,0,0,0,1,0,0,0,0])
 opdrachtvoorbeeldr30 = regel30(opdrachtvoorbeeld, 0)
-# opdrachtvoorbeeldr30.evolueer_en_visualiseer(30,0.4)
+opdrachtvoorbeeldr30.evolueer_en_visualiseer(30,0.4)
 #hier zien we dat de regel30 uit het voorbeeld goed werkt. 
 
 driedee = np.array([
@@ -278,7 +279,7 @@ string_theory = simpele_hoger_dimensionaale_CA(10)
 #problematisch en als tweede wordt de rekentijd erg hoog. dit heeft lengte 3 maar vanwege de hoge dimensie
 #is het aantal vakje gelijk aan 3**10 = 59049!!!
 
-opdrachtvoorbeeldr30.regelconverter(30)
+# print(opdrachtvoorbeeldr30.regelconverter(30))
 
 
 
