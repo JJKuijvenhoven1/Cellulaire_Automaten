@@ -181,7 +181,7 @@ class customregel(onsymmetrische_CA):
         dimensions = 1
         burenlijst = [[1],[0],[-1]]
         toestanden = [0,1]
-        super(customregel,self).__init__(dimensions, startgrid, randvoorwaarden, burenlijst, toestanden, regelcode)
+        super(customregel,self).__init__(dimensions, startgrid, randvoorwaarden, burenlijst, toestanden, self.regelconverter(regelcode))
 
 class regel30(onsymmetrische_CA):
     def __init__(self,startgrid,randvoorwaarden):
@@ -280,6 +280,9 @@ string_theory = simpele_hoger_dimensionaale_CA(10)
 #is het aantal vakje gelijk aan 3**10 = 59049!!!
 
 # print(opdrachtvoorbeeldr30.regelconverter(30))
+
+custom1dCA = customregel([0,0,0,0,1,0,0,0,0],0,30)
+custom1dCA.evolueer_en_visualiseer(0.4)
 
 
 
