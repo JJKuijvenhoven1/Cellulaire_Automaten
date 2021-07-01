@@ -32,11 +32,9 @@ def new_GoL_window(lengte, iteraties, randvoorwaarde, showevery):
         if btn["bg"] == een:
             btn["bg"] = nul
             startgrid[x,y-2] = 0
-            print(startgrid)
         else:
             btn["bg"] = een
             startgrid[x,y-2] = 1
-            print(startgrid)
 
     def magie(lengte=10):
         for x in range(lengte):
@@ -57,7 +55,6 @@ def new_GoL_window(lengte, iteraties, randvoorwaarde, showevery):
 
     def enter_gol(sg, it, rv, se):
         gol = ca.game_of_life(sg, randvoorwaarden=rv)
-        print("Enter")
         gol.evolueer_en_visualiseer(iterations=it, showevery=se)
     
     enter_GoL = Button(frame, bg="red", text="Enter")
@@ -71,7 +68,6 @@ def new_regel30_window(lengte, iteraties, randvoorwaarde, showevery):
     window.title("Regel 30 window")
     window.geometry("700x200")
     startgrid = np.zeros([lengte])
-    # frame = Frame(window)
     Grid.columnconfigure(window, 0, weight=1)
     Grid.rowconfigure(window, 0, weight=1)
     
@@ -79,11 +75,9 @@ def new_regel30_window(lengte, iteraties, randvoorwaarde, showevery):
         if btn["bg"] == "cyan":
             btn["bg"] = "yellow"
             startgrid[x-2] = 1
-            print(startgrid)
         elif btn["bg"] == "yellow":
             btn["bg"] = "cyan"
             startgrid[x-2] = 0
-            print(startgrid)
     
     def magie_r30(lengte):
         for x in range(2,lengte+2):
@@ -99,11 +93,9 @@ def new_regel30_window(lengte, iteraties, randvoorwaarde, showevery):
     magie_r30(lengte)
     
     def enter_r30(sg, it, rv, se):
-        print("Het startgrid is: ")
-        print(sg)
-        print("Het aantal iteraties is: " + str(it))
-        print("De randvoorwaarden zijn: " + str(rv))
-        print("Om de hoeveel wordt geshowt: " + str(se))
+        CAr30 = ca.regel30(startgrid=sg, randvoorwaarden=rv)
+        CAr30.evolueer_en_visualiseer(iterations=it, showevery=se)
+        
     
     enter_R30 = Button(window, bg="red", text="Enter")
     enter_R30.grid(column=0, row=0, sticky=N+S+E+W)
@@ -135,8 +127,6 @@ def new_1D_window(lengte, iteraties, randvoorwaarde, showevery):
             btn.grid(column=x, row=0, sticky=N+S+E+W)
             btn["command"] = lambda btn=btn, x=x: click_1D(btn, x)
             
-        # for y in range(lengte+2):
-        #     Grid.columnconfigure(window, y, weight=1)
         
         return window
     
@@ -149,12 +139,9 @@ def new_1D_window(lengte, iteraties, randvoorwaarde, showevery):
     regel_label.grid(row=1, column=0)
     
     def enter_1D(sg, it, rv, se, regel):
-        print("Het startgrid is: ")
-        print(sg)
-        print("Het aantal iteraties is: " + str(it))
-        print("De randvoorwaarden zijn: " + str(rv))
-        print("Om de hoeveel wordt geshowt: " + str(se))
-        print("De regel is: " + regel_var.get())
+        custom = ca.customregel(startgrid=sg, randvoorwaarden=rv, regelcode=regel)
+        custom.evolueer_en_visualiseer(iterations=it, showevery=se)
+        
     
     Enter_1D = Button(window, bg="red", text="Enter")
     Enter_1D.grid(column=0, row=0, sticky=N+S+E+W)
@@ -168,8 +155,8 @@ def new_1D_window(lengte, iteraties, randvoorwaarde, showevery):
 
 
 #randvoorwaarden
-rvtitel = Label(root, text="Kies je randvoorwaarde:")
-rvtitel.grid(row=0, column=0)
+rvtitel = Label(root, text="Welke randvoorwaarde wil je? ")
+rvtitel.grid(row=0, column=0, sticky=W)
 randvoorwaarde_var = IntVar()
 periodiek = Radiobutton(root, text="Periodiek", variable=randvoorwaarde_var, value=-1)
 periodiek.grid(row=1, column=0, sticky=W)
@@ -183,32 +170,34 @@ vonNeumann.grid(row=4, column=0, sticky=W)
 #lengte
 lengte_var = StringVar()
 lengte_invoer = Entry(root, textvariable=lengte_var)
-lengte_invoer.grid(row=7, column=0, sticky=W)
+lengte_invoer.grid(row=5, column=1)
 lengte_label = Label(root, text="Wat wordt de lengte van je grid? ")
-lengte_label.grid(row=6, column=0)
+lengte_label.grid(row=4, column=1)
 
 #welke automaat
 welke_automaat = IntVar()
+welke_automtaat_label = Label(root, text="Welk automaton wil je gebruiken? ")
+welke_automtaat_label.grid(row=6, column=0)
 GoL = Radiobutton(root, text="Game of Life", variable=welke_automaat, value=0)
-GoL.grid(row=0, column=1)
+GoL.grid(row=7, column=0, sticky=W)
 r30 = Radiobutton(root, text="Regel 30", variable=welke_automaat, value=1)
-r30.grid(row=1, column=1)
+r30.grid(row=8, column=0, sticky=W)
 eenD = Radiobutton(root, text="Algemene 1D automaat", variable=welke_automaat, value=2)
-eenD.grid(row=2, column=1)
+eenD.grid(row=9, column=0, sticky=W)
 
 #aantal iteraties
 iteratie_var = StringVar()
 iteratie_invoer = Entry(root, textvariable=iteratie_var)
-iteratie_invoer.grid(row=9, column=0, sticky=W)
+iteratie_invoer.grid(row=1, column=1)
 iteratie_label = Label(root, text="Hoeveel iteraties wil je uitvoeren? ")
-iteratie_label.grid(row=8, column=0)
+iteratie_label.grid(row=0, column=1)
 
 #show every
 showevery_var = StringVar()
 showevery_invoer = Entry(root, textvariable=showevery_var)
-showevery_invoer.grid(row=4, column=1)
+showevery_invoer.grid(row=3, column=1)
 showevery_label = Label(root, text="Om de hoeveel iteraties moet het afgebeeld worden? ")
-showevery_label.grid(row=3, column=1)
+showevery_label.grid(row=2, column=1)
 
 
 
@@ -222,6 +211,6 @@ def submit():
         new_1D_window(int(lengte_var.get()), int(iteratie_var.get()), randvoorwaarde_var.get(), int(showevery_var.get()))
         
 
-btnSubmit = Button(root, text="Submit", command=submit)
-btnSubmit.grid(row=10, column=5)
+btnSubmit = Button(root, text="Submit", bg="red", command=submit)
+btnSubmit.grid(row=8, column=1)
 root.mainloop()
