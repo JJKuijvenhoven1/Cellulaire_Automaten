@@ -16,6 +16,7 @@ class cellulair_automaton():
         self.regelcode = regelcode
         self.toestanden = toestanden
    
+    
     def evolueer(self, iterations=1):
         d = self.dimensions
         n = self.gridlength
