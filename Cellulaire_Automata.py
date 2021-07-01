@@ -15,6 +15,8 @@ class cellulair_automaton():
         self.burenlijst = burenlijst
         self.regelcode = regelcode
         self.toestanden = toestanden
+        
+        #visualisatie init
    
     
     def evolueer(self, iterations=1):
