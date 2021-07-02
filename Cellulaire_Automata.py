@@ -1,19 +1,22 @@
-import numpy as np
-import matplotlib as mpl
+import numpy as np #numpy wordt gebruikt voor arrays
+import matplotlib as mpl #matplotlib wordt gebruikt voor het visualiseren
+import time #time wordt gebruikt om tijd tussen de generaties te maken
+
+#al deze dingen zijn voor de UI 
 mpl.use('TKagg')
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import tkinter as Tk
-import time
 
-#dit is de standaard code waarvan alle CA's afgeleid zullen zijn.
+
+#dit is de standaard klasse waarvan alle CA's afgeleid zullen zijn.
 class cellulair_automaton():
-    def __init__(self,dimensions,startgrid,randvoorwaarden,burenlijst,toestanden,regelcode,UI=False,root=None):
+    def __init__(self,dimensions,startgrid,randvoorwaarden,burenlijst,toestanden,regelcode):
         
-        #de randvoorwaarden codatie is: -1 voor cirkeltje en 0123... enz zijn voor de hele rand die toestand
-        #save all relevant variables
+        #de randvoorwaarden codatie is: -2 voor neumann, -1 voor periodiek en 0123... enz zijn voor de hele rand die toestand
+        #sla alle relevante variablen op
         self.dimensions = dimensions
-        self.gridlength = len(startgrid)
+        self.gridlength = len(startgrid) #dit is later nodig
         self.grid = startgrid
         self.randvoorwaarden = randvoorwaarden
         self.burenlijst = burenlijst
@@ -21,6 +24,7 @@ class cellulair_automaton():
         self.toestanden = toestanden
         
         #visualisatie init
+        #ik weet ook niet precies hoe, maar het werkt
         if dimensions in [1,2]:
             self.visual = Tk.Tk()
             self.visual.title('visualisatie')    
@@ -35,13 +39,15 @@ class cellulair_automaton():
             self.canvas = FigureCanvasTkAgg(fig, master=self.visual)
             self.visualiseer()
             self.canvas.get_tk_widget().pack(side=Tk.TOP, fill=Tk.BOTH, expand=1)
+            
         
 
     def evolueer(self, iterations=1):
         d = self.dimensions
         n = self.gridlength
-        for i in range(iterations):
-            nieuwe_grid = -2 * np.ones(shape=[n] * d)
+        for i in range(iterations): #voor als we meerdere generaties in een keer willen doen
+            nieuwe_grid = np.empty(shape=[n] * d) #maak een empty grid in de vorm van self.grid
+            #deze code loopt langs elke cel in het grid en vult het lege grid met de evolueer_cel van het echte grid
             grid_met_index = np.nditer(self.grid, flags=["multi_index"])
             for x in grid_met_index:
                 nieuwe_grid[grid_met_index.multi_index] = self.evolueer_cel(list(grid_met_index.multi_index))
@@ -50,43 +56,42 @@ class cellulair_automaton():
             self.grid = nieuwe_grid
     
     def evolueer_cel(self, coords):
-        mycell = int(self.grid[tuple(coords)])
-        buurtoestanden = self.buurtoestanden_en_randvoorwaarden(coords)
-        return self.regels_toepassen(buurtoestanden, mycell)
+        mycell = int(self.grid[tuple(coords)]) 
+        buurtoestanden = self.buurtoestanden_en_randvoorwaarden(coords) #dit is voor alle ca gelijk
+        return self.regels_toepassen(buurtoestanden, mycell) #dit wordt overschreven door de child klassen
     
     def buurtoestanden_en_randvoorwaarden(self, coords):
         #hier bepalen wat de toetstanden van onze buren zijn
-        #de randvoorwaarden codatie is: -1 voor cirkeltje en 0123... enz zijn voor de hele rand die toestand 
         buurtoestanden = []
         for buurcoords in self.burenlijst:
-            #special case ranvoorwaarden == cirkeltje
+            #special case ranvoorwaarden == periodiek
             if self.randvoorwaarden == -1:
-                #oke de tactiek is om uit te rekenen waar je cirkello.vakje is 
+                #oke de tactiek is om uit te rekenen waar het bijbehorende periodieke vakje is
+                #dus alleen de coordinaat waarmee je over de rand gaat moet naar de andere kant loopen
                 cirkelcoords = [0]*self.dimensions
                 for i in range(len(buurcoords)):
-                    cirkelcoords[i] = (coords[i]+buurcoords[i])%self.gridlength
-                buurtoestanden.append(int(self.grid[tuple(np.array(cirkelcoords))]))
+                    cirkelcoords[i] = (coords[i]+buurcoords[i])%self.gridlength #modulo zorgt ervoor dat je altijd binnen het grid blijft
+                buurtoestanden.append(int(self.grid[tuple(np.array(cirkelcoords))])) #voeg de toestand toe
             #end specialcase    
             #normalcase    
             else:
                 #reset randvoorwaarde
-                isoutofrange = False
-                #we checken eerst of dit wel binnen het grid valt
+                isoutofrange = False #dit is om te checken of we van de buurtoestanden gebruik hebben gemaakt
+                #we checken eerst of de coords wel binnen het grid vallen
                 for i in range(len(buurcoords)):
                     #we doen het voor elke individuele coordinaat
                     if (buurcoords[i]+coords[i]) >= self.gridlength or (buurcoords[i]+coords[i])<= -1:
                         #dit betekent dat de ranvoorwaarden in werking gaan
-                        isoutofrange = True
-                        for toestand in self.toestanden:
-                            if self.randvoorwaarden == toestand:
+                        isoutofrange = True #niet meer de normale dingen doen
+                        for toestand in self.toestanden: #dit codeert voor randvoorwaarden 0123... enz
+                            if self.randvoorwaarden == toestand: 
                                 buurtoestanden.append(toestand)
-                                break
-                            elif self.randvoorwaarden == -2:
-                                #Neuman: de randen zijn jou waarde
+                                break #als een coordinaat outofrange is dan hoeven we de rest niet te checken
+                            elif self.randvoorwaarden == -2: #dit codeert Neuman: de randen zijn jou waarde
                                 buurtoestanden.append(self.grid[tuple(np.array(coords))])
                                 break
-                # nu de verandering doorvoeren als we binnen de perken waren
-                if not isoutofrange:
+                
+                if not isoutofrange: #als geen randvoorwaarde dan normale manier
                     buurtoestanden.append(int(self.grid[tuple(np.array(buurcoords) + np.array(coords))]))
             #end normalcase
         #end for loop
@@ -97,6 +102,12 @@ class cellulair_automaton():
         return 1
     
     def visualiseer(self):
+        '''we onderscheiden hier drie gevallen: 1 dimensie, 2 dimensies en meer dan twee dimensies.
+        de visualisatie code in __init__ regelt de meeste dingen we hoeven hier alleen im naar de 
+        nieuwe waarde te zetten en canvas.draw aan te roepen. 
+        parameters: self
+        return: void'''
+        
         
         if self.dimensions == 1:
             visual_grid = np.reshape(self.grid, (1,self.gridlength))
@@ -115,6 +126,9 @@ class cellulair_automaton():
 
         
     def evolueer_en_visualiseer(self, iterations=1,timeperframe=0.5, showevery=1):
+        '''deze code alterneert tussen visualiseren en volueren zodat je makkelijk de evoluties
+        kan weergeven
+        parameters: iterations(hoe vaak), timeperframe, showevery(dit kan gebruikt worden om frames te skippen voor snelheid)'''
         self.visualiseer()
         
         for i in range(iterations):
@@ -129,6 +143,11 @@ class cellulair_automaton():
 class symmetrische_CA(cellulair_automaton):
             
     def regels_toepassen(self, buurtoestanden, mycell):
+        '''dit is de symmetrische versie van regels toepassen. we tellen per toestand hoeveel van
+        onze buren zich in die toestand bevinden. Dit vullen we samen met onze eigen toestand in 
+        de regelmatrix in om zo de nieuwe toestand te krijgen.
+        parameters: buurtoestanden(een geordende lijst met daarin de toestanden van de buren), mycell(de toestand van de cell)
+        return: nieuwe toestand van de cel'''
         hoeveelvandezetoestand = []
         for toestand in self.toestanden:
             hoeveelvandezetoestand.append(0)
@@ -137,7 +156,7 @@ class symmetrische_CA(cellulair_automaton):
             for t in self.toestanden:
                 if buur_t == t:
                     hoeveelvandezetoestand[t]+= 1
-        #codering 
+        #invullen in codering
         hoeveelvandezetoestand.pop(0)
         codepos = tuple(hoeveelvandezetoestand + [mycell])
         return int(self.regelcode[codepos])
@@ -145,21 +164,28 @@ class symmetrische_CA(cellulair_automaton):
        
 
 class game_of_life(symmetrische_CA):
-    def __init__(self,startgrid,randvoorwaarden,UI=False,root=None):
+    def __init__(self,startgrid,randvoorwaarden):
+        '''deze klasse is enkel en alleen een set standaardwaarden. Deze standaardwaarden
+        maken John conways game of life.'''
         dimensions = 2
         burenlijst = [[1,1],[1,0],[1,-1],[0,-1],[-1,-1],[-1,0],[-1,1],[0,1]]
         toestanden = [0,1]
         regelcode = np.array([[0,0],[0,0],[0,1],[1,1],[0,0],[0,0],[0,0],[0,0],[0,0]])
-        super(game_of_life,self).__init__(dimensions, startgrid, randvoorwaarden, burenlijst, toestanden, regelcode, UI, root)
+        super(game_of_life,self).__init__(dimensions, startgrid, randvoorwaarden, burenlijst, toestanden, regelcode)
         
 class simpele_hoger_dimensionaale_CA(symmetrische_CA):
-    def __init__(self, dimensions,UI=False,root=None):
+    def __init__(self, dimensions):
+        '''deze klasse is enkel en alleen een set standaardwaarden. Deze standaardwaarden
+        maken een lengte drie in elke dimensie grid en vullen dat langzaam op door
+        elke cel die met een vlak grenst aan een levende cel levend te maken.'''
+        #maak een startgrid dat alleen maar nullen bevat behalve een 1 in het midden
         startgrid = 0
         for n in range(dimensions):
             startgrid =[startgrid,startgrid,startgrid]
         startgrid = np.array(startgrid)
         startgrid[tuple([1]*dimensions)] = 1       
         randvoorwaarden = 0
+        #geautomatiseerde manier om de burenlijst op te stellen
         burenlijst = []
         for n in range(dimensions):
             buurpos = [0]*dimensions
@@ -171,7 +197,7 @@ class simpele_hoger_dimensionaale_CA(symmetrische_CA):
         regelcode = np.array([[0,1]] + [[1,1]]*len(burenlijst))
 
         
-        super(simpele_hoger_dimensionaale_CA,self).__init__(dimensions, startgrid, randvoorwaarden, burenlijst, toestanden, regelcode,UI,root)
+        super(simpele_hoger_dimensionaale_CA,self).__init__(dimensions, startgrid, randvoorwaarden, burenlijst, toestanden, regelcode)
 
 #------------------------------------------------------------------------------
 
@@ -179,6 +205,7 @@ class simpele_hoger_dimensionaale_CA(symmetrische_CA):
 class onsymmetrische_CA(cellulair_automaton):
     
     def regels_toepassen(self, buurtoestanden, mycell):
+        '''Dit is de regels toepassen functie voor onsymmetrische CA"s. '''
         totaletoestand = 0
         for i in range(len(buurtoestanden)):
             totaletoestand += buurtoestanden[i]*(len(self.toestanden))**i
@@ -194,11 +221,11 @@ class onsymmetrische_CA(cellulair_automaton):
 
     
 class customregel(onsymmetrische_CA):
-    def __init__(self,startgrid,randvoorwaarden,regelcode,UI=False,root=None):
+    def __init__(self,startgrid,randvoorwaarden,regelcode):
         dimensions = 1
         burenlijst = [[1],[0],[-1]]
         toestanden = [0,1]
-        super(customregel,self).__init__(dimensions, startgrid, randvoorwaarden, burenlijst, toestanden, regelcode,UI,root)
+        super(customregel,self).__init__(dimensions, startgrid, randvoorwaarden, burenlijst, toestanden, regelcode)
         self.regelcode = self.regelconverter(self.regelcode)
         
 
@@ -208,397 +235,23 @@ class regel30(onsymmetrische_CA):
         burenlijst = [[1],[0],[-1]]
         toestanden = [0,1]
         regelcode = [0,1,1,1,1,0,0,0]
-        super(regel30,self).__init__(dimensions, startgrid, randvoorwaarden, burenlijst, toestanden, regelcode,UI,root)
+        super(regel30,self).__init__(dimensions, startgrid, randvoorwaarden, burenlijst, toestanden, regelcode)
 
 
 
         
-#------------------------------------------------------------------------------
-#UNIT TESTS
-#------------------------------------------------------------------------------
 
-# glider = np.array([[0,1,0,0,0,0,0,0,0,0],
-#                   [0,0,1,0,0,0,0,0,0,0],
-#                   [1,1,1,0,0,0,0,0,0,0],
-#                   [0,0,0,0,0,0,0,0,0,0],
-#                   [0,0,0,0,0,0,0,0,0,0],
-#                   [0,0,0,0,0,0,0,0,0,0],
-#                   [0,0,0,0,0,0,0,0,0,0],
-#                   [0,0,0,0,0,0,0,0,0,0],
-#                   [0,0,0,0,0,0,0,0,0,0],
-#                   [0,0,0,0,0,0,0,0,0,0],
-#                   ])
-# glidergof = game_of_life(glider,-1) #gof = game of life
-# glidergof.evolueer_en_visualiseer(30,0.4)
-# glidergof.visual.mainloop()
-#Hier testen we de basic game of life functies met rondgaande randvoorwaarden
 
-# loafer = np.array([[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-#                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-#                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-#                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-#                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-#                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-#                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-#                     [0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,0,0,0,0,0],
-#                     [0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0],
-#                     [0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,1,0,0,0],
-#                     [0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,0,0],
-#                     [0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0],
-#                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0],
-#                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0],
-#                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,0],
-#                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0],
-#                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0],
-#                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-#                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-#                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-#                     ])
-# loafergof = game_of_life(loafer, 0)
-# loafergof.evolueer_en_visualiseer(30,0.4)
-# loafergof.visual.mainloop()
-#hier testen we de rand = 0 randvoorwaarde. De Loafer sterf tegen de rand aan.
 
-# opdrachtvoorbeeld = np.array([0,0,0,0,1,0,0,0,0])
-# opdrachtvoorbeeldr30 = regel30(opdrachtvoorbeeld, 0)
-# opdrachtvoorbeeldr30.evolueer_en_visualiseer(10,1)
-#hier zien we dat de regel30 uit het voorbeeld goed werkt. 
 
-# driedee = np.array([
-#                     [[0,0,0],[0,0,0],[0,0,0]],
-#                     [[0,0,0],[0,1,0],[0,0,0]],
-#                     [[0,0,0],[0,0,0],[0,0,0]],
-#                     ])
-# driedeeburen = [[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]]
-# driedeeregels = np.array([[0,1],[1,1],[1,1],[1,1],[1,1],[1,1],[1,1]])
-# driedeeCA = symmetrische_CA(3, driedee, 0, driedeeburen, [0,1], driedeeregels)
-# driedeeCA.evolueer_en_visualiseer(5)
-#dit is een super basic 3 dimensionaal Cellulaiprintr automaton om aan te tonen dat het werkt. het zou zich moeten opvullen
-# via een zeer basic patroon namelijk als een van buren 1 is wordt ik dat ook. De buren zijn daarbij ingesteld als alles 
-#waar elke kubus een vlak mee deelt, ofwel niet schuin. 
 
-# vierdee = np.array([
-#                     [[[0,0,0],[0,0,0],[0,0,0]],[[0,0,0],[0,0,0],[0,0,0]],[[0,0,0],[0,0,0],[0,0,0]]],
-#                     [[[0,0,0],[0,0,0],[0,0,0]],[[0,0,0],[0,1,0],[0,0,0]],[[0,0,0],[0,0,0],[0,0,0]]],
-#                     [[[0,0,0],[0,0,0],[0,0,0]],[[0,0,0],[0,0,0],[0,0,0]],[[0,0,0],[0,0,0],[0,0,0]]],
-#                     ])
-# vierdeeburen = [[1,0,0,0],[-1,0,0,0],[0,1,0,0],[0,-1,0,0],[0,0,1,0],[0,0,-1,0],[0,0,0,1],[0,0,0,-1]]
-# vierdeeregels = np.array([[0,1],[1,1],[1,1],[1,1],[1,1],[1,1],[1,1],[1,1],[1,1]])
-# vierdeeCA = symmetrische_CA(4, vierdee, 0, vierdeeburen, [0,1], vierdeeregels)
-# vierdeeCA.evolueer_en_visualiseer(5)
-#Hier weer hetzelfde super basic cellulair automaton alleen dan in vier dimensies. Hieraan kunnen we goed zien dat het 
-#snel te complext wordt om nog nuttig te zijn als we in hogere dimensies gaan werken
 
-#op de hierboven beschreven unit tests hebben we nog een klasse gebaseerd, de simpele hoger dimensionale CA die voor 
-#een gegeven dimensie precies zon CA maakt.
 
-# vijfdee = simpele_hoger_dimensionaale_CA(5)
-# vijfdee.evolueer_en_visualiseer(5)
-# wat we zien is dat 5d erg slecht te visualiseren valt. Wat verder ook opvalt is dat elke dimensie die je toevoegt 
-# ervoor zorgt dat je een extra stap nodig hebt om alle posities 1 te maken.
 
-# string_theory = simpele_hoger_dimensionaale_CA(10)
-# string_theory.evolueer_en_visualiseer(1)
-#en hier zien we het probleem met hogere dimensies nog eens verder uit gebreid. als eerste is visualisatie
-#problematisch en als tweede wordt de rekentijd erg hoog. dit heeft lengte 3 maar vanwege de hoge dimensie
-#is het aantal vakje gelijk aan 3**10 = 59049!!!
 
-# print(opdrachtvoorbeeldr30.regelconverter(30))
 
-# custom1dCA = customregel(np.array([0,0,0,0,1,0,0,0,0]),0,30)
-# custom1dCA.evolueer_en_visualiseer(15,0.4)
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# class onsym_1d_CA(onsymmetrische_CA):
-#     def __init__(self, startgrid, randvoorwaarden, burenlijst, toestanden, regelcode):
-#         dimensions = 1
-#         super(onsymmetrische_CA,self).__init__(dimensions, startgrid, randvoorwaarden, burenlijst, toestanden, regelcode)
-        
-    
-
-
-#------------------------------------------------------------------------------
-
-# class symm_2d_CA(symmetrische_CA):
-#     def __init__(self,startgrid,randvoorwaarden,burenlijst,toestanden,regelcode):
-#         dimensions = 2
-#         super(symm_2d_CA,self).__init__(dimensions, startgrid, randvoorwaarden, burenlijst, toestanden, regelcode)
-    
-#     def visualiseer(self):
-#         plt.axis('off')
-#         scale = plt.Normalize(-1,1,False)
-                              
-#         # plt.axis('tight')
-#         # plt.axis('image')
-#         plt.imshow(self.grid, norm=scale)
-#         plt.show()
- 
-# class regel_30(cellulair_automata):
-#     def __init__(self, startgrid):
-#         # dit is een 1d CA ookwel regel 30 genoemnd
-#         # de randvoorwaarde is rondje
-#         self.dimensions = 1
-#         self.gridlength = len(startgrid) + 2
-#         self.grid = -1 * np.ones(shape=[self.gridlength] * self.dimensions)
-#         self.regel = '00011110'
-
-#         # start invullen
-#         for i in range(1, self.gridlength - 1):
-#             self.grid[i] = int(startgrid[i - 1])
-
-#     def evolueer_cel(self, coord_lijst):
-#         midden = self.grid[tuple(coord_lijst)]
-#         nieuwe_toestand = midden
-
-#         # skip als rand
-#         if midden == -1:
-#             return -1
-
-#         links = self.grid[tuple([coord_lijst[0] - 1])]
-#         rechts = self.grid[tuple([coord_lijst[0] + 1])]
-
-#         # randvoorwaarden
-#         if links == -1:
-#             links = self.grid[-2]
-#         if rechts == -1:
-#             rechts = self.grid[1]
-
-#             # regels
-#         binary = str(int(links)) + str(int(midden)) + str(int(rechts))
-#         deci = int(binary, 2)
-#         nieuwe_toestand = int(self.regel[-(deci + 1)])
-
-#         return nieuwe_toestand
-
-
-# # ------------------------------------------------------------------------------
-
-# class simple_life(cellulair_automata):
-#     def __init__(self, startgrid, regelint=30, randvoorwaarden=0):
-#         # dit is een 1d CA ookwel regel 30 genoemnd
-#         # de randvoorwaarde is rondje
-#         self.dimensions = 1
-#         self.gridlength = len(startgrid) + 2
-#         self.grid = -1 * np.ones(shape=[self.gridlength] * self.dimensions)
-#         self.randvoorwaarden = randvoorwaarden
-
-#         # start invullen
-#         for i in range(1, self.gridlength - 1):
-#             self.grid[i] = int(startgrid[i - 1])
-
-#         # regelint to binairy
-#         binary = np.base_repr(regelint, base=2)
-#         desiredlength = 8
-#         pudding = desiredlength - len(binary)
-#         binary = pudding * '0' + binary
-#         self.regel = binary
-
-#     def evolueer_cel(self, coord_lijst):
-#         midden = self.grid[tuple(coord_lijst)]
-#         nieuwe_toestand = midden
-
-#         # skip als rand
-#         if midden == -1:
-#             return -1
-
-#         links = self.grid[tuple([coord_lijst[0] - 1])]
-#         rechts = self.grid[tuple([coord_lijst[0] + 1])]
-
-#         # randvoorwaarden
-#         if self.randvoorwaarden == 0:
-#             # rondje
-#             if links == -1:
-#                 links = self.grid[-2]
-#             if rechts == -1:
-#                 rechts = self.grid[1]
-#         elif self.randvoorwaarden == 1:
-#             # standaard 1
-#             if links == -1:
-#                 links = 1
-#             if rechts == -1:
-#                 rechts = 1
-#         elif self.randvoorwaarden == 2:
-#             # standaard 0
-#             if links == -1:
-#                 links = 0
-#             if rechts == -1:
-#                 rechts = 0
-#         else:
-#             print('De randvoorwaarden moet 0, 1 of 2 zijn. fuck u')
-
-#         # regels
-#         binary = str(int(links)) + str(int(midden)) + str(int(rechts))
-#         deci = int(binary, 2)
-#         nieuwe_toestand = int(self.regel[-(deci + 1)])
-
-#         return nieuwe_toestand
-
-
-
-# # ------------------------------------------------------------------------------
-# class kut_game2d(cellulair_automata):
-#     def __init__(self, startgrid, birth=[3], death=[0, 1, 4, 5, 6, 7, 8], randvoorwaarden=1,
-#                  burenlijst=[[-1, -1], [-1, 0], [-1, 1], [0, 1], [1, 1], [1, 0], [1, -1], [0, -1]]):
-#         self.dimensions = 2
-#         self.gridlength = len(startgrid) + 2
-#         # we accepteren geen buren die 2 vakjes ver weg zijn. lekker puh
-#         self.burenlijst = burenlijst
-#         self.randvoorwaarden = randvoorwaarden
-#         self.birth = birth
-#         self.death = death
-#         regels = [0, 1] * (len(burenlijst) + 1)
-#         for i in birth:
-#             regels[2 * i] = 1
-#         for j in death:
-#             regels[2 * j + 1] = 0
-#         self.regels = regels
-
-#         if len(regels) / 2 - 1 != len(burenlijst):
-#             print('jonathan boos :(')
-
-#         # start toestand invullen.
-#         self.grid = -1*np.ones(shape=[len(startgrid)+2]*2)
-#         self.grid[1:-1,1:-1] = startgrid
-
-#     def evolueer_cel(self, coord_lijst):
-#         midden = self.grid[tuple(coord_lijst)]
-#         # skip
-#         if midden == -1:
-#             return -1
-
-#         buurtoestanden = []
-#         for buurcoords in self.burenlijst:
-#             buurtoestanden.append(self.grid[tuple(np.array(buur) + np.array(coord_lijst))])
-
-#         # randvoorwaarden
-#         if self.randvoorwaarden == 0:
-#             # cirkeltje
-#             print('HUILEN')
-#             for i in range(len(buurtoestanden)):
-#                 if buurtoestanden[i] == -1:
-#                     buurtoestanden[i] = 'cry yourself to sleep'
-#         elif self.randvoorwaarden == 1:
-#             # alles 0
-#             for i in range(len(buurtoestanden)):
-#                 if buurtoestanden[i] == -1:
-#                     buurtoestanden[i] = 0
-#         elif self.randvoorwaarden == 2:
-#             # alles 1
-#             for i in range(len(buurtoestanden)):
-#                 if buurtoestanden[i] == -1:
-#                     buurtoestanden[i] = 1
-#         else:
-#             print('dit is geen goede randvoorwaarde. Kies 0, 1 of 2')
-
-#         # regels
-#         aantallevendeburen = 0
-#         for buurtoestand in buurtoestanden:
-#             if buurtoestand == 1:
-#                 aantallevendeburen += 1
-#         # plz geef uitleg:...
-#         positie = 2 * aantallevendeburen + int(midden)
-
-#         return int(self.regels[positie])
-    
-#     def visualiseer(self):
-        
-#         plt.axis('off')
-#         scale = plt.Normalize(-1,1,False)
-                              
-#         # plt.axis('tight')
-#         # plt.axis('image')
-#         plt.imshow(self.grid, norm=scale)
-#         plt.show()
-
-
-
-# # ------------------------------------------------------------------------------
-
-
-# class game_of_life(kut_game2d):
-#     def __init__(self, startgrid):
-#         self.dimensions = 2
-#         self.gridlength = len(startgrid) + 2
-#         self.burenlijst = [[-1, -1], [-1, 0], [-1, 1], [0, 1], [1, 1], [1, 0], [1, -1], [0, -1]]
-
-#         # start toestand invullen.
-#         row = np.array([-1] * (self.gridlength - 2))
-#         collumn = np.array([-1] * self.gridlength)
-#         startgrid = np.vstack([startgrid, row])
-#         startgrid = np.vstack([row, startgrid])
-#         startgrid = startgrid.transpose()
-#         startgrid = np.vstack([startgrid, collumn])
-#         startgrid = np.vstack([collumn, startgrid])
-#         startgrid = startgrid.transpose()
-#         self.grid = startgrid
-
-#     def evolueer_cel(self, coord_lijst):
-#         midden = self.grid[tuple(coord_lijst)]
-#         # skip
-#         if midden == -1:
-#             return -1
-
-#         buurtoestanden = []
-#         for buur in self.burenlijst:
-#             buurtoestanden.append(self.grid[tuple(np.array(buur) + np.array(coord_lijst))])
-
-#         # randvoorwaarden
-#         for i in range(len(buurtoestanden)):
-#             if buurtoestanden[i] == -1:
-#                 buurtoestanden[i] = 0
-
-#         # regels
-#         aantallevendeburen = 0
-#         for buurtoestand in buurtoestanden:
-#             if buurtoestand == 1:
-#                 aantallevendeburen += 1
-
-#         if (aantallevendeburen >= 4 or aantallevendeburen <= 1) and midden == 1:
-#             # DIE
-#             return 0
-#         elif aantallevendeburen == 3 and midden == 0:
-#             # wordt geboren
-#             return 1
-#         else:
-#             # stay the same
-#             return midden
-# # -----------------------------------------------------------------------------
-# def tree_dimensions(cellulair_automata):
-#     def __init__(self):
-#         pass
-# #------------------------------------------------------------------------------
-# # testcode om het verschil tussen de automata te laten zien
-# size = 50
-# dim = 2
-# start = np.random.choice([0,1], size=[size]*dim,p=[.9,.1])
-
-# for i in range(50):
-#     print (i)
-#     if i >10:
-#         break
-# print( [1,1]+[2,2])
-# # x = cellulair_automata()
-# # y = regel_30('000010000')
-# # z = simple_life('1000000000000000', 50)
-# # a = game_of_life(np.ones([10]*2))
-# # b = kut_game2d(start, birth=[0,1],death=[4,5],burenlijst=[[0,-1],[-1,-1],[1,-1],[-1,0],[-1,1]])
-
-# # b.evolueer_en_visualiseer(60,0.2,1,1)
 
