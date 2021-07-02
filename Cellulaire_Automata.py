@@ -29,20 +29,8 @@ class cellulair_automaton():
             raise TypeError('Dimensions must be an integer.')
         if dimensions <= 0:
             raise Exception('Dimensions must be greater than zero.')
-        #startgrid check
-        if not isinstance(startgrid, np.array):
-            raise TypeError('The startgrid must be an numpy array.')
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
         #de randvoorwaarden codatie is: -2 voor neumann, -1 voor periodiek en 0123... enz zijn voor de hele rand die toestand
         #sla alle relevante variablen op
         self.dimensions = dimensions

@@ -117,6 +117,8 @@ buren als bij de game of life. De regels gaan als volgt: als je een levende boom
 dan vlieg je zelf ook in brand. Anders blijf je leven. Als je in brand staat ga je de volgende generatie dood. Dode bomen blijven dood.
 We maken elke keer een 100 bij 100 grid met die op random plekken 0, 1 en 2 zet, volgens de opgegeven kansen.'''
 
-
-hexagon = CA.symmetrische_CA(dimensions=2, startgrid=dit, randvoorwaarden=-1, 
-                             burenlijst=[[1,1],[1,0],[1,-1],[0,-1],[-1,-1],[-1,0],[-1,1],[0,1]])
+hexagrid = np.zeros((10,10))
+hexagrid[(5,5)] = 1
+hexagon = CA.symmetrische_CA(dimensions=2, startgrid=hexagrid, randvoorwaarden=0, burenlijst=[[1,1],[1,0],[0,-1],[-1,-1],[-1,0],[0,1]], toestanden=[0,1],regelcode=np.array([[0,1],[1,1],[1,1],[1,1],[1,1],[1,1],[1,1]]))
+hexagon.evolueer_en_visualiseer(10)
+hexagon.visual.mainloop()
