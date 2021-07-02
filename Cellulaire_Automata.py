@@ -12,7 +12,37 @@ import tkinter as Tk
 #dit is de standaard klasse waarvan alle CA's afgeleid zullen zijn.
 class cellulair_automaton():
     def __init__(self,dimensions,startgrid,randvoorwaarden,burenlijst,toestanden,regelcode):
+        '''Deze init functie neemt de argumenten en slaat ze op zodat latere functies er makkelijk
+        met self toegang tot hebben. Daarnaast regelt het ook het grootste gedeelte van de visuele
+        dingen. De visuele dingen begrijpen we niet 100% dus daar zijn minder comments en opmerkingen over.
+        parameters: dimensions(het aantal dimensies waarin we werken),
+                    startgrid(de startpositie van het grid),
+                    randvoorwaarden(wat er moet gebeuren aan de randen)
+                    burenlijst(een geordende lijst met de relatieve posities van de buren)
+                    toestanden(de mogelijke toestanden)
+                    regelcode(zie verslag)
+        return void'''
         
+        #input binnen de termen houden.
+        #dimensions check
+        if not isinstance(dimensions,int):
+            raise TypeError('Dimensions must be an integer.')
+        if dimensions <= 0:
+            raise Exception('Dimensions must be greater than zero.')
+        #startgrid check
+        if not isinstance(startgrid, np.array):
+            raise TypeError('The startgrid must be an numpy array.')
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
         #de randvoorwaarden codatie is: -2 voor neumann, -1 voor periodiek en 0123... enz zijn voor de hele rand die toestand
         #sla alle relevante variablen op
         self.dimensions = dimensions
@@ -28,7 +58,6 @@ class cellulair_automaton():
         if dimensions in [1,2]:
             self.visual = Tk.Tk()
             self.visual.title('visualisatie')    
-                
                
             self.scale = plt.Normalize(-1,self.toestanden[-1],False)
             
@@ -43,6 +72,9 @@ class cellulair_automaton():
         
 
     def evolueer(self, iterations=1):
+        '''Deze functie maakt een nieuw grid van dezelfde grootte als het oude grid en loopt
+        daarna door alle cellen waarbij hij het nieuwe grid langzaamt vult mbv de evolueer cel functie.
+        Hij werkt met self om dingen op te slaan en returned dus niks'''
         d = self.dimensions
         n = self.gridlength
         for i in range(iterations): #voor als we meerdere generaties in een keer willen doen
@@ -56,11 +88,20 @@ class cellulair_automaton():
             self.grid = nieuwe_grid
     
     def evolueer_cel(self, coords):
+        '''Deze functie splitst het evolueren van een cell in een standaargedeelte: buurtoestanden
+        en randvoorwaarden, en een gedeelte dat overschreven kan worden: regels toepassen.'''
         mycell = int(self.grid[tuple(coords)]) 
         buurtoestanden = self.buurtoestanden_en_randvoorwaarden(coords) #dit is voor alle ca gelijk
         return self.regels_toepassen(buurtoestanden, mycell) #dit wordt overschreven door de child klassen
     
     def buurtoestanden_en_randvoorwaarden(self, coords):
+        '''Deze functie bepaald de buren van de coordinaten die als argument zijn meegegeven.
+        het bepalen van de positie van een buur komt neer op vector optelling. Het grootste 
+        deel van de code is gewijd aan het rekening houden met en uitvoeren van de randvoorwaarden.
+        parameters: coords
+        return: buurtoestanden(dit is een geordende lijst met op plek 0 de toestand van de buur die
+                              in de burenlijst ook op plek 0 staat)'''
+        
         #hier bepalen wat de toetstanden van onze buren zijn
         buurtoestanden = []
         for buurcoords in self.burenlijst:
@@ -178,6 +219,11 @@ class simpele_hoger_dimensionaale_CA(symmetrische_CA):
         '''deze klasse is enkel en alleen een set standaardwaarden. Deze standaardwaarden
         maken een lengte drie in elke dimensie grid en vullen dat langzaam op door
         elke cel die met een vlak grenst aan een levende cel levend te maken.'''
+        #dimensions check
+        if not isinstance(dimensions,int):
+            raise TypeError('Dimensions must be an integer.')
+        if dimensions <= 0:
+            raise Exception('Dimensions must be greater than zero.')
         #maak een startgrid dat alleen maar nullen bevat behalve een 1 in het midden
         startgrid = 0
         for n in range(dimensions):
@@ -205,13 +251,18 @@ class simpele_hoger_dimensionaale_CA(symmetrische_CA):
 class onsymmetrische_CA(cellulair_automaton):
     
     def regels_toepassen(self, buurtoestanden, mycell):
-        '''Dit is de regels toepassen functie voor onsymmetrische CA"s. '''
+        '''Dit is de regels toepassen functie voor onsymmetrische CA"s. Je converteert hier de 
+        de toestanden van de buren naar een index waarmee je met het proces beschreven in ons 
+        verslag je makkelijk de nieuwe toestand kan bepalen.
+        parameters: buurtoestanden(de geordende lijst met de toestanden van de buren), mycell(Dit wordt niet gebruikt)'''
         totaletoestand = 0
         for i in range(len(buurtoestanden)):
             totaletoestand += buurtoestanden[i]*(len(self.toestanden))**i
         return self.regelcode[totaletoestand]
     
     def regelconverter(self, integer):
+        '''Dit is een converter zodat bekende dingen als regel 90 makkelijk omgezet kunnen worden.
+        Deze doet het alleen voor CA"s met maar twee toestanden.'''
         output = [0]*(len(self.toestanden)**len(self.burenlijst))
         binary = str(bin(integer))
         binary = binary[2:]
@@ -222,6 +273,8 @@ class onsymmetrische_CA(cellulair_automaton):
     
 class customregel(onsymmetrische_CA):
     def __init__(self,startgrid,randvoorwaarden,regelcode):
+        '''Dit is een onsymmetrische CA die gebruik maakt van de regelconverter om 
+        integers als input van de regelcode te nemen. Verder het zelfde als regel 30'''
         dimensions = 1
         burenlijst = [[1],[0],[-1]]
         toestanden = [0,1]
@@ -230,7 +283,8 @@ class customregel(onsymmetrische_CA):
         
 
 class regel30(onsymmetrische_CA):
-    def __init__(self,startgrid,randvoorwaarden,UI=False,root=None):
+    def __init__(self,startgrid,randvoorwaarden):
+        '''De bekende regel 30 cellulaire automaton.'''
         dimensions = 1
         burenlijst = [[1],[0],[-1]]
         toestanden = [0,1]
