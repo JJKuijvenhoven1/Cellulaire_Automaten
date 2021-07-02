@@ -57,6 +57,7 @@ class cellulair_automaton():
         #ik weet ook niet precies hoe, maar het werkt
         if dimensions in [1,2]:
             self.visual = Tk.Tk()
+            self.visual.geometry("1000x1000")
             self.visual.title('visualisatie')    
                
             self.scale = plt.Normalize(-1,self.toestanden[-1],False)
