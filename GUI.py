@@ -20,10 +20,10 @@ def new_GoL_window(lengte, iteraties, randvoorwaarde, showevery):
     Grid.rowconfigure(window, 0, weight=1)
     Grid.columnconfigure(window, 0, weight=1)
     frame.grid(row=0, column=0, sticky=N+S+E+W)
-    grid = Frame(frame)
-    grid.grid(sticky=N+S+E+W, column=0, row=7, columnspan=2)
-    Grid.rowconfigure(frame, 7, weight=1)
-    Grid.columnconfigure(frame, 0, weight=1)
+    # grid = Frame(frame)
+    # grid.grid(sticky=N+S+E+W, column=0, row=7, columnspan=2)
+    # Grid.rowconfigure(frame, 7, weight=1)
+    # Grid.columnconfigure(frame, 0, weight=1)
 
     een = "yellow"
     nul = "cyan"
