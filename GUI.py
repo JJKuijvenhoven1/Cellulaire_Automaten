@@ -93,7 +93,7 @@ def new_regel30_window(lengte, iteraties, randvoorwaarde, showevery):
     magie_r30(lengte)
     
     def enter_r30(sg, it, rv, se):
-        CAr30 = ca.regel30(startgrid=sg, randvoorwaarden=rv)
+        CAr30 = ca.regel30(startgrid=sg, randvoorwaarden=rv,UI=True,root=root)
         CAr30.evolueer_en_visualiseer(iterations=it, showevery=se)
         
     
